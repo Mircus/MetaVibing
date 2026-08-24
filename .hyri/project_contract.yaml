@@ -3,19 +3,23 @@ project_name: MetaVibing Manual and Companion Repository
 project_type: booklet_plus_repo
 profile: booklet_plus_repo_v0
 global_goal: >
-  Produce an expert-level, hands-on book with a companion open repository
-  containing runnable examples, experiments, templates, benchmarks, and
-  progressively more sophisticated agent architectures. Per resolved
-  decision gate dec-e84f9216, MetaVibing itself is a proof specimen for
-  Governed HyRI, not the main intellectual priority.
+  Add a governance-anchored Part XVI: Evaluation Baseline and Shipping Gates
+  to the booklet, tightly scoped to what decision gate dec-e84f9216 and
+  evals/baseline/README.md already establish. Quote the core claim verbatim
+  from the decision brief. Include a Claims-to-Evidence table linking each
+  claim to a specific test or metric. Explicitly mark "Results: TBD" — no
+  readiness claims, since no eval trial has actually been run yet. Defer
+  broader prose expansion until real baseline results exist.
 source_artifacts:
-  - id: resolved_decision
-    path: .hyri/decision_gate_dec-e84f9216_resolved.md
-    role: decision_reference
+  - id: booklet_v1
+    path: book/MetaVibing_Provisional_Booklet_v1.md
+    role: prior_edition
     required: true
 final_deliverables:
-  - id: eval_baseline_charter
-    path: evals/baseline/README.md
+  - id: booklet_v2_md
+    path: book/MetaVibing_Provisional_Booklet_v2.md
 failure_conditions:
+  - raw_markdown_only
   - scaffold_only
   - status_summary_only
+  - unearned_readiness_claim
