@@ -27,7 +27,9 @@ API docs at: http://localhost:8000/docs
 pytest
 ```
 
-All 8 baseline tests should pass on a clean checkout.
+All 8 baseline tests pass — real output from an isolated environment (fresh venv, no
+project-wide config) is recorded in [`test_logs/taskflow_tests.txt`](test_logs/taskflow_tests.txt),
+not just claimed here.
 
 ## Structure
 

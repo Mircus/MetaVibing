@@ -28,10 +28,9 @@ cd examples/taskflow
 pytest
 ```
 
-Run architecture checker:
+Run architecture checker (from repo root):
 ```bash
-cd mcp/architecture-checker
-python checker.py examples/taskflow/src/
+python mcp/architecture-checker/checker.py examples/taskflow/src/
 ```
 
 ---

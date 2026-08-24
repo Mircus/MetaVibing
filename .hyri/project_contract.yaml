@@ -1,0 +1,20 @@
+schema_version: governed_hyri_project_v0
+project_name: MetaVibing Manual and Companion Repository
+project_type: booklet_plus_repo
+profile: booklet_plus_repo_v0
+global_goal: >
+  Produce an expert-level, hands-on book with a companion open repository
+  containing runnable examples, experiments, templates, benchmarks, and
+  progressively more sophisticated agent architectures.
+source_artifacts:
+  - id: decision_gate_text
+    path: .hyri/decision_gate_dec-e84f9216.md
+    role: decision_gate_reference
+    required: true
+final_deliverables:
+  - id: decision_brief
+    path: governance/decision_brief_dec-e84f9216.md
+failure_conditions:
+  - scaffold_only
+  - status_summary_only
+  - resolves_decision_gate_automatically

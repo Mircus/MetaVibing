@@ -89,7 +89,16 @@ claude-metavibing/
 
 ### 1. Read the Manual
 
-The manual lives in [`book/metavibing-manual.md`](book/metavibing-manual.md).
+The provisional booklet — the expanded edition, with the companion repository's real
+examples worked into the text — is [`book/MetaVibing_Provisional_Booklet_v1.md`](book/MetaVibing_Provisional_Booklet_v1.md),
+also available as [`.docx`](book/MetaVibing_Provisional_Booklet_v1.docx) and
+[`.pdf`](book/MetaVibing_Provisional_Booklet_v1.pdf).
+
+The unexpanded, direct conversion of the original manuscript is kept at
+[`book/metavibing-manual.md`](book/metavibing-manual.md) for reference.
+
+**The examples in the booklet are runnable, not illustrative** — `examples/taskflow/` is a real
+FastAPI app you can start, test, and scan with the architecture checker yourself (below).
 
 ### 2. Run the Sandbox Project
 
