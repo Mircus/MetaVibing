@@ -5,16 +5,17 @@ profile: booklet_plus_repo_v0
 global_goal: >
   Produce an expert-level, hands-on book with a companion open repository
   containing runnable examples, experiments, templates, benchmarks, and
-  progressively more sophisticated agent architectures.
+  progressively more sophisticated agent architectures. Per resolved
+  decision gate dec-e84f9216, MetaVibing itself is a proof specimen for
+  Governed HyRI, not the main intellectual priority.
 source_artifacts:
-  - id: decision_gate_text
-    path: .hyri/decision_gate_dec-e84f9216.md
-    role: decision_gate_reference
+  - id: resolved_decision
+    path: .hyri/decision_gate_dec-e84f9216_resolved.md
+    role: decision_reference
     required: true
 final_deliverables:
-  - id: decision_brief
-    path: governance/decision_brief_dec-e84f9216.md
+  - id: eval_baseline_charter
+    path: evals/baseline/README.md
 failure_conditions:
   - scaffold_only
   - status_summary_only
-  - resolves_decision_gate_automatically

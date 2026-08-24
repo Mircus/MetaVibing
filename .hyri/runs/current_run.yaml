@@ -1,59 +1,47 @@
 schema_version: governed_hyri_run_v0
-run_id: decision_brief_dec_e84f9216_v1
+run_id: eval_baseline_charter_v1
 profile: booklet_plus_repo_v0
-stage: DECISION_BRIEF
-role: planner
+stage: EVAL_BASELINE_CHARTER
+role: writer
 active_object:
-  id: decision_brief
-  path: governance/decision_brief_dec-e84f9216.md
+  id: eval_baseline_charter
+  path: evals/baseline/README.md
 inputs:
-  - path: .hyri/project_contract.yaml
-    role: project_contract_reference
+  - path: .hyri/decision_gate_dec-e84f9216_resolved.md
+    role: decision_reference
     required: true
-  - path: .hyri/runs/current_run.yaml
-    role: run_contract_reference
-    required: true
-  - path: .hyri/decision_gate_dec-e84f9216.md
-    role: decision_gate_text
-    required: true
-  - path: book/MetaVibing_Provisional_Booklet_v1.md
-    role: existing_book
+  - path: governance/decision_brief_dec-e84f9216.md
+    role: decision_brief_reference
     required: true
   - path: examples/taskflow/README.md
     role: companion_example_repo
     required: true
 required_outputs:
-  - path: governance/decision_brief_dec-e84f9216.md
+  - path: evals/baseline/README.md
 allowed_write_paths:
-  - governance/decision_brief_dec-e84f9216.md
+  - evals/baseline/README.md
 forbidden_paths:
   - book/
   - examples/taskflow/src/
   - examples/taskflow/tests/
-  - evals/
   - mcp/
   - claude/
   - .github/
+  - governance/
 does_not_count:
   - status_summary_only
   - scaffold_only
-  - resolving the decision gate automatically
-  - claiming MetaVibing is ready
 success_validators:
   - validate_required_outputs_exist
   - validate_required_sections_present
-  - validate_decision_gate_referenced
-  - validate_human_gate_required
+  - validate_examples_referenced
 minimum_requirements:
-  decision_gate_id: "dec-e84f9216"
   required_sections:
-    - "What is the strongest possible core claim for MetaVibing?"
-    - "Alternative weaker/safer core claims"
-    - "Primary user options, with consequences"
-    - "Which examples/taskflow baseline tasks should count"
-    - "Candidate metrics and numeric thresholds"
-    - "Measurement protocol"
-    - "Shipping gates"
-    - "Risks / open decisions for Mirco"
-    - "Recommended decision set"
-human_gate_after: true
+    - "Core Claim Being Tested"
+    - "Target User"
+    - "Baseline Tasks"
+    - "Metrics and Thresholds"
+    - "Measurement Protocol"
+    - "Pass/Fail Gates"
+    - "What Does Not Count as Success"
+human_gate_after: false
