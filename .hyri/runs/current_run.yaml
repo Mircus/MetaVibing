@@ -1,17 +1,15 @@
 schema_version: governed_hyri_run_v0
-run_id: expanded_draft_v2_v2
+run_id: expanded_draft_v2_v3
 profile: booklet_plus_repo_v0
 stage: EXPANDED_DRAFT
 role: writer
 active_object:
   id: booklet_v2_md
   path: book/MetaVibing_Provisional_Booklet_v2.md
+
 inputs:
   - path: book/MetaVibing_Provisional_Booklet_v1.md
     role: raw_manual
-    required: true
-  - path: evals/baseline/README.md
-    role: companion_example_repo
     required: true
   - path: governance/decision_brief_dec-e84f9216.md
     role: decision_brief_reference
@@ -19,36 +17,57 @@ inputs:
   - path: .hyri/decision_gate_dec-e84f9216_resolved.md
     role: decision_reference
     required: true
+  - path: .hyri/decision_brief_approval.md
+    role: approval_reference
+    required: true
+  - path: evals/baseline/README.md
+    role: companion_example_repo
+    required: true
+  - path: examples/taskflow/test_logs/taskflow_tests.txt
+    role: execution_evidence
+    required: true
+  - path: examples/taskflow/test_logs/taskflow_tests.meta.json
+    role: execution_evidence_metadata
+    required: true
+
 required_outputs:
   - path: book/MetaVibing_Provisional_Booklet_v2.md
+
 allowed_write_paths:
   - book/MetaVibing_Provisional_Booklet_v2.md
+
 forbidden_paths:
+  - book/MetaVibing_Provisional_Booklet_v1.md
   - examples/taskflow/src/
   - examples/taskflow/tests/
   - mcp/
   - claude/
-  - .github/
-  - governance/
   - evals/
-  - book/MetaVibing_Provisional_Booklet_v1.md
+  - governance/
+  - .github/
+
 does_not_count:
   - raw_markdown_only
   - scaffold_only
   - status_summary_only
-  - claiming readiness before any eval trial has actually been run
+  - claiming the project is complete
+  - claiming full empirical validation has been done
+  - claiming the 3x3x2 baseline protocol has been run when only one trial exists
+
 success_validators:
   - validate_required_outputs_exist
   - validate_word_count_increase
   - validate_not_raw_markdown_only
   - validate_required_sections_present
   - validate_examples_referenced
+
 minimum_requirements:
   word_count_increase_percent: 10
   required_sections:
+    - "Core Claim"
+    - "Target User"
+    - "Baseline Evidence"
+    - "What Has Not Been Validated"
     - "Part XVI"
-    - "Evaluation Baseline and Shipping Gates"
-    - "Claims"
-    - "Evidence"
-    - "Results: TBD"
+
 human_gate_after: true

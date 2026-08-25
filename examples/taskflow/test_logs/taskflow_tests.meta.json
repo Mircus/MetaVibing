@@ -1,0 +1,11 @@
+{
+  "generated_by": "governed_executor",
+  "command": "pytest -p no:cacheprovider",
+  "cwd": "examples/taskflow",
+  "exit_code": 0,
+  "timeout_seconds": 120,
+  "timed_out": false,
+  "started_at": "2026-08-25T10:19:38.677071+00:00",
+  "finished_at": "2026-08-25T10:19:39.644613+00:00",
+  "stdout_sha256": "5b38501b43bfd9fd643f36b6d25e8c97301bf1f3246efee1549a26fa2437642a"
+}

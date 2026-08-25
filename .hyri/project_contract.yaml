@@ -2,24 +2,73 @@ schema_version: governed_hyri_project_v0
 project_name: MetaVibing Manual and Companion Repository
 project_type: booklet_plus_repo
 profile: booklet_plus_repo_v0
+
+# Stable declaration of the whole project — NOT rewritten per run. Individual
+# governed stages (current_run.yaml) narrow toward one of the deliverables
+# below at a time; this file is the persistent statement of what "done"
+# means overall. Format explicitly scoped per Mirco (2026-08-24): markdown
+# only. No docx/pdf packaging requirement — that was dropped entirely.
 global_goal: >
-  Add a governance-anchored Part XVI: Evaluation Baseline and Shipping Gates
-  to the booklet, tightly scoped to what decision gate dec-e84f9216 and
-  evals/baseline/README.md already establish. Quote the core claim verbatim
-  from the decision brief. Include a Claims-to-Evidence table linking each
-  claim to a specific test or metric. Explicitly mark "Results: TBD" — no
-  readiness claims, since no eval trial has actually been run yet. Defer
-  broader prose expansion until real baseline results exist.
+  Produce a real, expanded MetaVibing booklet (markdown) anchored to a
+  resolved evaluation charter, together with a companion example repository
+  (TaskFlow) that has one real governed_execution proof (its declared pytest
+  suite passing, generated_by=governed_executor, exit_code=0) — NOT a full
+  verified/runnable readiness claim. A prior readiness review of this
+  repository returned NO-GO; that verdict has not been superseded, only
+  narrowly offset by the one passing test run above. Any deliverable that
+  discusses the companion repo must state this distinction explicitly rather
+  than implying blanket verification. Per resolved decision gate
+  dec-e84f9216, MetaVibing itself is a proof specimen for Governed HyRI v0,
+  not the main intellectual priority — every deliverable below exists to
+  prove Governed HyRI can produce real artifacts, not to make MetaVibing
+  itself a finished product.
+
 source_artifacts:
+  - id: original_manual_docx
+    path: The Claude MetaVibing Manual.docx
+    role: original_manual
+    required: true
   - id: booklet_v1
     path: book/MetaVibing_Provisional_Booklet_v1.md
     role: prior_edition
     required: true
+  - id: resolved_decision
+    path: .hyri/decision_gate_dec-e84f9216_resolved.md
+    role: decision_reference
+    required: true
+
+# The full "book + repo combo" Mirco actually asked for, spelled out
+# explicitly rather than left implicit or improvised stage-by-stage.
 final_deliverables:
   - id: booklet_v2_md
     path: book/MetaVibing_Provisional_Booklet_v2.md
+    # Governance-anchored expansion of v1: quotes the resolved core claim
+    # verbatim, includes a Claims-to-Evidence table, marks results TBD
+    # until real eval trials exist. Not yet produced — blocked on API
+    # credits as of 2026-08-24, contract/gate already approved by
+    # Strategic Devil.
+  - id: eval_baseline_charter
+    path: evals/baseline/README.md
+    # DELIVERED 2026-08-24 — real governed PASS, validators confirmed.
+  - id: taskflow_readme
+    path: examples/taskflow/README.md
+    # Companion repo documentation — already real, pre-dates Governed
+    # HyRI (built before this build existed), verified functional.
+  - id: taskflow_test_log
+    path: examples/taskflow/test_logs/taskflow_tests.txt
+    # Superseded 2026-08-25: previously hand-run by Claude directly (not
+    # HyRI). Now targeted by a real governed_execution stage — a
+    # deterministic subprocess executor, not an LLM worker, with
+    # anti-forgery metadata (generated_by=governed_executor) validators
+    # reject if absent or attributed to anything else. See Option D.
+  - id: taskflow_test_metadata
+    path: examples/taskflow/test_logs/taskflow_tests.meta.json
+    # Execution provenance: command, cwd, exit_code, timestamps,
+    # stdout_sha256, generated_by. Not yet produced by the executor.
+
 failure_conditions:
   - raw_markdown_only
   - scaffold_only
   - status_summary_only
   - unearned_readiness_claim
+  - docx_or_pdf_required_as_gate  # explicitly not a requirement — Mirco's call, 2026-08-24

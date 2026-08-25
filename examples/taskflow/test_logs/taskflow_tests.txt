@@ -1,26 +1,8 @@
-# Real pytest run, isolated environment outside the HyRI monorepo
-# Command: pytest -v  (run from a fresh copy of examples/taskflow/, no parent pyproject.toml)
-# Date: 2026-08-23
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0
+rootdir: /data/projects/proj-703c959f/repos/Metavibing/examples/taskflow
+collected 8 items
 
-============================= test session starts =============================
-platform win32 -- Python 3.11.9, pytest-8.2.2, pluggy-1.6.0 -- C:\Users\mirco\AppData\Local\Temp\tfvenv2\Scripts\python.exe
-rootdir: C:\Users\mirco\AppData\Local\Temp\clean_taskflow_check
-plugins: anyio-4.14.2
-collecting ... collected 8 items
+tests/test_tasks.py ........                                             [100%]
 
-tests/test_tasks.py::test_create_user PASSED                             [ 12%]
-tests/test_tasks.py::test_list_users_empty PASSED                        [ 25%]
-tests/test_tasks.py::test_get_user_not_found PASSED                      [ 37%]
-tests/test_tasks.py::test_create_task PASSED                             [ 50%]
-tests/test_tasks.py::test_list_tasks_empty PASSED                        [ 62%]
-tests/test_tasks.py::test_complete_task PASSED                           [ 75%]
-tests/test_tasks.py::test_delete_task PASSED                             [ 87%]
-tests/test_tasks.py::test_filter_tasks_by_done PASSED                    [100%]
-
-============================== warnings summary ===============================
-..\tfvenv2\Lib\site-packages\starlette\formparsers.py:12
-  C:\Users\mirco\AppData\Local\Temp\tfvenv2\Lib\site-packages\starlette\formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
-    import multipart
-
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 8 passed, 1 warning in 1.99s =========================
+============================== 8 passed in 0.63s ===============================
