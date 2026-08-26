@@ -1,51 +1,86 @@
 schema_version: governed_hyri_run_v0
-run_id: adopt_taskflow_readme_v1
+run_id: public_release_preflight_v2
 profile: booklet_plus_repo_v0
-stage: ADOPT_EXISTING_ARTIFACT
-role: adoption
+stage: PUBLIC_RELEASE_PREFLIGHT
+role: verifier
 active_object:
-  id: examples_taskflow_readme_adoption
-  path: governance/adoptions/examples_taskflow_README_adoption.md
+  id: public_release_preflight
+  path: governance/public_release_preflight.md
 
 inputs:
-  - path: examples/taskflow/README.md
-    role: target_artifact
+  - path: .hyri/preflight_evidence/remote_verification.txt
+    role: remote_verification_evidence
+    required: true
+  - path: .hyri/preflight_evidence/working_tree_status.txt
+    role: working_tree_evidence
+    required: true
+  - path: .hyri/preflight_evidence/preflight_scan_evidence.txt
+    role: secret_scan_evidence
+    required: true
+  - path: .hyri/preflight_evidence/public_release_contents.txt
+    role: release_contents_evidence
+    required: true
+  - path: .hyri/preflight_evidence/provenance_status.txt
+    role: provenance_evidence
+    required: true
+  - path: .hyri/preflight_evidence/required_public_files_check.txt
+    role: required_files_evidence
     required: true
 
 required_outputs:
-  - path: governance/adoptions/examples_taskflow_README_adoption.md
+  - path: governance/public_release_preflight.md
 
 allowed_write_paths:
-  - governance/adoptions/examples_taskflow_README_adoption.md
+  - governance/public_release_preflight.md
 
 forbidden_paths:
-  - examples/taskflow/README.md
-  - examples/taskflow/src/
-  - examples/taskflow/tests/
+  - README.md
+  - LICENSE
+  - SECURITY.md
+  - CONTRIBUTING.md
   - book/
   - evals/
+  - examples/taskflow/
   - mcp/
   - claude/
-  - .github/
+  - governance/adoptions/
+  - governance/decision_brief_dec-e84f9216.md
+  - governance/project_completion_report.md
+  - .hyri/preflight_evidence/
 
 does_not_count:
-  - rewriting, editing, or improving examples/taskflow/README.md in any way
-  - a certificate that does not contain the artifact's real, current sha256 hash
-  - claiming the artifact was natively produced under governance (it predates Governed HyRI)
-  - claiming full readiness validation of the companion repo (a prior audit returned NO-GO, unrelated to this adoption)
-  - status_summary_only
+  - independently re-running git commands instead of using the supplied evidence inputs verbatim
+  - claiming full readiness/empirical validation
+  - claiming all artifacts share the same provenance
+  - paraphrasing Mirco's authorization instead of quoting it verbatim
+  - creating or modifying any file other than the declared active_object
+  - omitting the SECURITY.md or CONTRIBUTING.md sha256 hash
+  - describing PUBLIC_RELEASE_FILES as a clean native governed run rather than a revalidated recovery stage
 
 success_validators:
-  - validate_existing_artifact_exists
-  - validate_artifact_is_declared_final_deliverable
-  - validate_artifact_hash_captured
-  - validate_target_file_not_modified
-  - validate_required_readme_sections_present
+  - validate_required_outputs_exist
+  - validate_required_sections_present
+  - validate_preflight_authorization_quoted
+  - validate_preflight_no_real_secrets_present
+  - validate_human_gate_required
   - validate_no_forbidden_paths_touched
 
 minimum_requirements:
   required_sections:
-    - "Running"
-    - "Testing"
+    - "Remote Verification"
+    - "Working Tree Status"
+    - "Secret"
+    - "Public-Release Contents"
+    - "Provenance Status"
+    - "Required Public Files"
+    - "Human Authorization"
+    - "a9b601f758da3958f6a432011c8888f38c547b949a3c8cadfe267635a222244b"
+    - "7ff1b5ad198a85ada428f474ad126ba3dc6a529140b54c8a2726425023bfb143"
+  required_authorization_text: >-
+    Mirco authorizes an initial seed push of the Governed HyRI v0 MetaVibing
+    proof specimen to the empty GitHub repository
+    https://github.com/Mircus/MetaVibing, after public-repo safety checks
+    pass. This is not a claim of full empirical validation or production
+    readiness.
 
 human_gate_after: true
