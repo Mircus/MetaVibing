@@ -25,4 +25,6 @@ Do **not** commit API keys, tokens, or credentials to this repository. No API ke
 
 If you discover a security issue in the repository content (e.g., accidentally committed credentials, a dangerous script), open a GitHub issue marked **[SECURITY]** or contact the maintainer directly via GitHub.
 
+**Do not paste secrets, tokens, private keys, or exploit details into a public GitHub issue.** A public issue should describe the type and location of the problem (e.g., "a credential-shaped string appears in file X, line Y") without exposing the secret itself. Send the sensitive detail privately to the maintainer via a GitHub direct/contact channel on their profile, or another private channel if one is available.
+
 Response is best-effort; there is no guaranteed SLA.
