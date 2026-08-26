@@ -1,0 +1,11 @@
+{
+  "generated_by": "governed_executor",
+  "command": "git push origin main",
+  "cwd": ".",
+  "exit_code": 128,
+  "timeout_seconds": 120,
+  "timed_out": false,
+  "started_at": "2026-08-26T20:05:57.213521+00:00",
+  "finished_at": "2026-08-26T20:05:57.637620+00:00",
+  "stdout_sha256": "1743972015ad97e7f1c484e5d163aac526be18e7124cb0d1276a64706901afd2"
+}

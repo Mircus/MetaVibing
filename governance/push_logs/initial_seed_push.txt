@@ -1,0 +1,1 @@
+fatal: unable to access 'https://github.com/Mircus/MetaVibing.git/': server verification failed: certificate signer not trusted. (CAfile: /etc/ssl/certs/ca-certificates.crt CRLfile: none)
