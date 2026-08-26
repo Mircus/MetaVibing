@@ -4,7 +4,7 @@
 **Stage:** PUBLIC_RELEASE_PREFLIGHT
 **Role:** verifier
 **Active Object:** governance/public_release_preflight.md
-**Overall Readiness Verdict:** CONDITIONAL — see section 7 (Required Public Files) for blocking gaps
+**Overall Readiness Verdict:** CONDITIONAL — human authorization required (see section 7)
 
 ---
 
@@ -45,14 +45,14 @@ Result: zero refs returned — the remote repository exists and is completely em
 
 ```
 git status --short:
-(no output = clean working tree)
+ M .hyri/runs/current_run.yaml
 
 current branch: main
-commit to be pushed (HEAD): 49a8997d71714253bcfa397a70780a51a35ee675
-commit subject: Prepare repo for push: add project completion report
+commit to be pushed (HEAD): bff5ac5b86f22fed3c470040af39b895d239fb71
+commit subject: Fix SECURITY.md: warn against pasting secrets into public GitHub issues
 ```
 
-**Interpretation:** Working tree is clean. No unstaged or uncommitted changes. HEAD commit is identified.
+**Interpretation:** One tracked file (`.hyri/runs/current_run.yaml`) has an unstaged modification from the current preflight run. This file is governance-internal and will be committed as part of the final preflight close-out before push. HEAD commit is identified.
 
 ---
 
@@ -91,22 +91,24 @@ Top-level files and directories that will be published (from `git ls-files`, act
 .hyri/                              (governance contracts: project_contract.yaml, current_run.yaml, decision records, this preflight's own evidence)
 .hyri_baseline.json
 CLAUDE.md
+CONTRIBUTING.md                     (public contribution policy — DELIVERED_REVALIDATED, run_id public_release_files_v1)
 Claude MetaVibing — Goals for the Manual and Companion Repository.md
 FRICTION_LEDGER.md
 LICENSE
 README.md
+SECURITY.md                         (public security policy — DELIVERED_REVALIDATED, run_id public_release_files_v1)
 The Claude MetaVibing Manual.docx
 book/                               (v1 raw manual + v2 expanded booklet, md/docx/pdf)
 claude/                             (agents, hooks, rules, skills — the MetaVibing meta-stack)
 evals/baseline/README.md            (evaluation charter)
 examples/taskflow/                  (FastAPI sandbox app: src/, tests/, README, requirements.txt, test_logs/)
-governance/                         (decision brief, adoption certificate, project completion report)
+governance/                         (decision brief, adoption certificate, project completion report, this preflight report)
 mcp/architecture-checker/           (checker.py + one check log)
 
 experiments/, patterns/, templates/ exist as empty local directories but contain no tracked files — git does not track empty directories, so nothing under them will actually be published.
 ```
 
-**Interpretation:** Contents are as expected for a Governed HyRI v0 proof specimen. Empty directories (experiments/, patterns/, templates/) will not be published.
+**Interpretation:** Contents are as expected for a Governed HyRI v0 proof specimen. `SECURITY.md` and `CONTRIBUTING.md` are present (see section 6 for sha256 hashes and provenance disclosure). Empty directories (experiments/, patterns/, templates/) will not be published.
 
 ---
 
@@ -132,7 +134,7 @@ Facts that MUST be stated plainly in the preflight report:
 5. The 3x3x2 baseline evaluation protocol (3 tasks x 3 trials x 2 conditions) declared in evals/baseline/README.md has NOT been run. No empirical uplift claim has been tested.
 ```
 
-**Interpretation:** Provenance is COMPLETE_PROVENANCE_MIXED. Artifacts are a mix of ledger-imported and adopted-existing provenances. This must be disclosed wherever the repository's outputs are referenced as evidence.
+**Interpretation:** Provenance is COMPLETE_PROVENANCE_MIXED. Artifacts are a mix of ledger-imported and adopted-existing provenances. This must be disclosed wherever the repository's outputs are referenced as evidence. Not all artifacts share the same provenance.
 
 ### TaskFlow Companion — Explicit Readiness Distinction
 
@@ -152,27 +154,29 @@ Any downstream reference to TaskFlow test results must state this distinction ex
 > *Evidence source: `.hyri/preflight_evidence/required_public_files_check.txt` — reproduced verbatim.*
 
 ```
-README.md — EXISTS
-LICENSE — EXISTS
-SECURITY.md — MISSING
-CONTRIBUTING.md — MISSING
-governance/project_completion_report.md — EXISTS
-project_rollup.json (raw) — NOT PRESENT in this repo (it lives in hyri_runtime/governance/, outside this git repo, by design). The human-readable equivalent, governance/project_completion_report.md, IS present and IS tracked.
+README.md — EXISTS — sha256: cf6a499f4c1b25f195e81eec6b291118eac2fcad7ab4c79f35a04af9416a18d0
+LICENSE — EXISTS — sha256: 5f047b0ae203f39b9c8ed5d95721aa90dcab3455ae490cfd295f291900c0ce83
+SECURITY.md — EXISTS — sha256: a9b601f758da3958f6a432011c8888f38c547b949a3c8cadfe267635a222244b
+CONTRIBUTING.md — EXISTS — sha256: 7ff1b5ad198a85ada428f474ad126ba3dc6a529140b54c8a2726425023bfb143
+governance/project_completion_report.md — EXISTS — sha256: fdf31a7f54297db3d57e47f0da316ae81255db9311286133bcd1e8d88b1fab7c
+project_rollup.json (raw) — NOT PRESENT in this repo (lives in hyri_runtime/governance/, outside this git repo, by design). The human-readable equivalent, governance/project_completion_report.md, IS present and IS tracked.
 
-MISSING_PUBLIC_RELEASE_FILE: SECURITY.md, CONTRIBUTING.md — these were never authored. Report this plainly; do not create them without being asked.
+All previously-missing required public-release files (SECURITY.md, CONTRIBUTING.md) now exist and are approved: DELIVERED_REVALIDATED, run_id public_release_files_v1, approved by Mirco 2026-08-26.
 ```
 
-**⚠ BLOCKING GAPS — MISSING_PUBLIC_RELEASE_FILE:**
+**Interpretation:** All required public-release files are present.
 
-| File | Status |
-|------|--------|
-| `README.md` | ✅ EXISTS |
-| `LICENSE` | ✅ EXISTS |
-| `SECURITY.md` | ❌ **MISSING** |
-| `CONTRIBUTING.md` | ❌ **MISSING** |
-| `governance/project_completion_report.md` | ✅ EXISTS |
+| File | Status | SHA-256 |
+|------|--------|---------|
+| `README.md` | ✅ EXISTS | `cf6a499f4c1b25f195e81eec6b291118eac2fcad7ab4c79f35a04af9416a18d0` |
+| `LICENSE` | ✅ EXISTS | `5f047b0ae203f39b9c8ed5d95721aa90dcab3455ae490cfd295f291900c0ce83` |
+| `SECURITY.md` | ✅ EXISTS | `a9b601f758da3958f6a432011c8888f38c547b949a3c8cadfe267635a222244b` |
+| `CONTRIBUTING.md` | ✅ EXISTS | `7ff1b5ad198a85ada428f474ad126ba3dc6a529140b54c8a2726425023bfb143` |
+| `governance/project_completion_report.md` | ✅ EXISTS | `fdf31a7f54297db3d57e47f0da316ae81255db9311286133bcd1e8d88b1fab7c` |
 
-`SECURITY.md` and `CONTRIBUTING.md` were never authored. They are **not being created by this preflight run** — the governed constraint prohibits creating them without explicit instruction. These gaps must be resolved (or explicitly accepted by Mirco) before public release proceeds.
+### SECURITY.md and CONTRIBUTING.md — Provenance Disclosure
+
+`SECURITY.md` and `CONTRIBUTING.md` were not produced in a single clean native governed run. They were initially absent, reported as missing in a prior preflight pass, then authored and committed in a recovery stage (`run_id: public_release_files_v1`), and subsequently revalidated following a validator bug fix in `revalidation.py`. The stage is accurately described as a **revalidated recovery stage**, not a clean native governed run. The sha256 hashes above reflect the files as approved by Mirco on 2026-08-26.
 
 ---
 
@@ -184,13 +188,12 @@ MISSING_PUBLIC_RELEASE_FILE: SECURITY.md, CONTRIBUTING.md — these were never a
 
 **Authorization status:** AWAITING MIRCO'S EXPLICIT SIGN-OFF
 
-This section must be counter-signed by Mirco before the seed push proceeds. The authorization above is the minimum required text; Mirco may augment it with explicit acceptance of the SECURITY.md and CONTRIBUTING.md gap if he chooses to release despite those missing files.
+This section must be counter-signed by Mirco before the seed push proceeds. The authorization above is the minimum required text; Mirco may augment it if he wishes.
 
 **Instructions for Mirco:**
 1. Review this document in full.
-2. If accepting the SECURITY.md and CONTRIBUTING.md gaps as a known limitation for the initial seed push, state that acceptance explicitly (e.g., "I accept the SECURITY.md and CONTRIBUTING.md gap for this initial proof-specimen seed push").
-3. Confirm the authorization text above by signing with date and name.
-4. Once signed, the push may proceed.
+2. Confirm the authorization text above by signing with date and name.
+3. Once signed, update `governance/public_release_preflight.md` with your signature and the seed push may proceed.
 
 ---
 
@@ -199,17 +202,19 @@ This section must be counter-signed by Mirco before the seed push proceeds. The 
 | Check | Result |
 |-------|--------|
 | Remote verification | ✅ PASS — repo exists, empty |
-| Working tree status | ✅ PASS — clean, HEAD identified |
+| Working tree status | ⚠ ONE MODIFIED FILE — `.hyri/runs/current_run.yaml` (governance-internal, to be committed before push) |
 | Secret scan | ✅ PASS — no secrets found |
 | Public-release contents | ✅ PASS — contents as expected |
-| Provenance status | ⚠ COMPLETE_PROVENANCE_MIXED — disclosed |
-| Required public files | ❌ BLOCKING — SECURITY.md and CONTRIBUTING.md missing |
+| Provenance status | ⚠ COMPLETE_PROVENANCE_MIXED — disclosed; not all artifacts share the same provenance |
+| Required public files | ✅ PASS — all present; SECURITY.md and CONTRIBUTING.md are DELIVERED_REVALIDATED (revalidated recovery stage, not a clean native governed run) |
 | Human authorization | ⏳ AWAITING MIRCO SIGN-OFF |
 
-**Overall:** CONDITIONAL — two required files are missing. Push may not proceed until Mirco explicitly accepts this gap or the files are authored and added.
+**Overall:** CONDITIONAL — all file and scan checks pass; push awaits Mirco's explicit authorization.
 
 ---
 
 *Generated by: governed_executor (verifier role, PUBLIC_RELEASE_PREFLIGHT stage)*
 *Date: 2026-08-26*
-*Evidence inputs: all six .hyri/preflight_evidence/ files read verbatim, not re-run*
+*Evidence inputs: all six `.hyri/preflight_evidence/` files read verbatim, not re-run*
+*SECURITY.md sha256: a9b601f758da3958f6a432011c8888f38c547b949a3c8cadfe267635a222244b*
+*CONTRIBUTING.md sha256: 7ff1b5ad198a85ada428f474ad126ba3dc6a529140b54c8a2726425023bfb143*
