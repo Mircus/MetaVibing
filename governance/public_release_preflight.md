@@ -1,22 +1,30 @@
-# Public Release Preflight Verification
-**Stage:** PUBLIC_RELEASE_PREFLIGHT  
-**Role:** verifier  
-**Date:** 2026-08-26  
-**Target Repository:** https://github.com/Mircus/MetaVibing  
-**HEAD Commit:** 49a8997d71714253bcfa397a70780a51a35ee675  
-**Subject:** Prepare repo for push: add project completion report  
+# Public Release Preflight — MetaVibing Governed HyRI v0
+
+**Date:** 2026-08-26
+**Stage:** PUBLIC_RELEASE_PREFLIGHT
+**Role:** verifier
+**Active Object:** governance/public_release_preflight.md
+**Overall Readiness Verdict:** CONDITIONAL — see section 7 (Required Public Files) for blocking gaps
 
 ---
 
-## Governing Disclaimer
+## Resolved Evaluation Charter
 
-MetaVibing v0 is a **proof specimen for Governed HyRI v0**, not a finished commercial product (per resolved decision gate dec-e84f9216). Every deliverable in this repository exists to demonstrate that Governed HyRI can produce real, auditable artifacts — not to make MetaVibing itself a finished product. Any reader should understand this distinction before drawing conclusions about the companion TaskFlow application or the evaluation baseline declared within.
+This preflight document is anchored to the resolved decision gate **dec-e84f9216**. Under that gate, MetaVibing is a **proof specimen for Governed HyRI v0**, not the primary intellectual product, and not a finished commercial offering. All deliverables exist to demonstrate that Governed HyRI can produce real artifacts under governance discipline.
+
+---
+
+## Prior Readiness Verdict
+
+A prior structured readiness audit of this repository returned **NO-GO**. That verdict **has not been superseded**. It has been only narrowly offset by one passing `governed_execution` pytest run for the TaskFlow companion (generated_by=governed_executor, exit_code=0). This preflight does not claim blanket verification or full empirical validation.
+
+The 3×3×2 baseline evaluation protocol (3 tasks × 3 trials × 2 conditions) declared in `evals/baseline/README.md` has **not been run**. No empirical uplift claim has been tested or established.
 
 ---
 
 ## 1. Remote Verification
 
-**Evidence source:** `.hyri/preflight_evidence/remote_verification.txt`
+> *Evidence source: `.hyri/preflight_evidence/remote_verification.txt` — reproduced verbatim.*
 
 ```
 Intended remote URL (stored on project record, git_remote field): https://github.com/Mircus/MetaVibing.git
@@ -27,13 +35,13 @@ git ls-remote https://github.com/Mircus/MetaVibing.git (unauthenticated, public 
 Result: zero refs returned — the remote repository exists and is completely empty.
 ```
 
-**Finding:** The target remote exists and is verified empty as of 2026-08-26. No git-level remote is configured in the local repository; it will be added at push time. This is consistent with an initial seed push to a blank repository.
+**Interpretation:** The GitHub repository exists and is empty. No prior content will be overwritten by the seed push.
 
 ---
 
 ## 2. Working Tree Status
 
-**Evidence source:** `.hyri/preflight_evidence/working_tree_status.txt`
+> *Evidence source: `.hyri/preflight_evidence/working_tree_status.txt` — reproduced verbatim.*
 
 ```
 git status --short:
@@ -44,13 +52,13 @@ commit to be pushed (HEAD): 49a8997d71714253bcfa397a70780a51a35ee675
 commit subject: Prepare repo for push: add project completion report
 ```
 
-**Finding:** Working tree is clean. No uncommitted changes. Branch is `main`. The push candidate is a single commit at HEAD: `49a8997d71714253bcfa397a70780a51a35ee675`.
+**Interpretation:** Working tree is clean. No unstaged or uncommitted changes. HEAD commit is identified.
 
 ---
 
 ## 3. Secret Scan
 
-**Evidence source:** `.hyri/preflight_evidence/preflight_scan_evidence.txt`
+> *Evidence source: `.hyri/preflight_evidence/preflight_scan_evidence.txt` — reproduced verbatim.*
 
 ```
 Mechanical secret/credential scan performed directly against tracked repository content (git ls-files + content grep), 2026-08-26.
@@ -68,16 +76,16 @@ Local absolute path check (e.g. C:\Users\mirco\...): NO MATCHES in tracked file 
 Conclusion: no secrets, credentials, or local machine paths found in any tracked content.
 ```
 
-**Finding:** PASS — no secrets, credentials, API keys, or local machine paths detected in any tracked content or commit messages. The `hyri_runtime/` directory (containing runtime state files) is outside this git repository by design and will not be published.
+**Interpretation:** Secret scan passed. No credentials, tokens, or local machine paths found in any tracked file.
 
 ---
 
 ## 4. Public-Release Contents
 
-**Evidence source:** `.hyri/preflight_evidence/public_release_contents.txt`
+> *Evidence source: `.hyri/preflight_evidence/public_release_contents.txt` — reproduced verbatim.*
 
 ```
-Top-level files and directories that will be published (from `git ls-files`, actual tracked content):
+Top-level files and directories that will be published (from `git ls-files`, actual tracked content, not a directory listing that could include untracked scratch files):
 
 .gitignore
 .hyri/                              (governance contracts: project_contract.yaml, current_run.yaml, decision records, this preflight's own evidence)
@@ -98,13 +106,13 @@ mcp/architecture-checker/           (checker.py + one check log)
 experiments/, patterns/, templates/ exist as empty local directories but contain no tracked files — git does not track empty directories, so nothing under them will actually be published.
 ```
 
-**Finding:** Release contents are confirmed via `git ls-files` (tracked content only). Empty directories (`experiments/`, `patterns/`, `templates/`) will not appear in the published repository. The `.hyri/` governance directory, including this preflight evidence, will be published — this is intentional for auditability.
+**Interpretation:** Contents are as expected for a Governed HyRI v0 proof specimen. Empty directories (experiments/, patterns/, templates/) will not be published.
 
 ---
 
 ## 5. Provenance Status
 
-**Evidence source:** `.hyri/preflight_evidence/provenance_status.txt`
+> *Evidence source: `.hyri/preflight_evidence/provenance_status.txt` — reproduced verbatim.*
 
 ```
 Governed HyRI v0 project_rollup.json verdict for this project (proj-703c959f), as of 2026-08-26T13:52:40Z: COMPLETE_PROVENANCE_MIXED.
@@ -124,19 +132,24 @@ Facts that MUST be stated plainly in the preflight report:
 5. The 3x3x2 baseline evaluation protocol (3 tasks x 3 trials x 2 conditions) declared in evals/baseline/README.md has NOT been run. No empirical uplift claim has been tested.
 ```
 
-**Finding:** Provenance verdict is **COMPLETE_PROVENANCE_MIXED**. The following must be stated plainly:
+**Interpretation:** Provenance is COMPLETE_PROVENANCE_MIXED. Artifacts are a mix of ledger-imported and adopted-existing provenances. This must be disclosed wherever the repository's outputs are referenced as evidence.
 
-1. **MetaVibing v0 is COMPLETE_PROVENANCE_MIXED** — not natively-produced-only, not fully empirically validated.
-2. **This is a proof specimen for Governed HyRI v0**, not a finished commercial product.
-3. **Artifacts have mixed provenance**: ledger-imported (reconstructed from `progress_ledger.jsonl`, with explicit disclosure) and adopted-existing (`examples/taskflow/README.md`, which predates Governed HyRI entirely).
-4. **TaskFlow is NOT fully readiness-certified.** A prior structured readiness audit returned **NO-GO**. That verdict has not been superseded — it has only been narrowly offset by one passing `governed_execution` pytest run (`exit_code=0`, `generated_by=governed_executor`). This single passing run does not constitute blanket verification of the companion application.
-5. **The 3×3×2 baseline evaluation protocol** declared in `evals/baseline/README.md` (3 tasks × 3 trials × 2 conditions) has **NOT been run**. No empirical uplift claim has been tested or validated.
+### TaskFlow Companion — Explicit Readiness Distinction
+
+The TaskFlow companion (`examples/taskflow/`) is **NOT fully readiness-certified**:
+
+- A prior structured readiness audit returned **NO-GO**.
+- That NO-GO verdict has **not been superseded**.
+- The one passing `governed_execution` pytest run (generated_by=governed_executor, exit_code=0) provides narrow offset evidence only — it does not constitute blanket verification.
+- `examples/taskflow/README.md` predates Governed HyRI entirely; it is `DELIVERED_ADOPTED_EXISTING`.
+
+Any downstream reference to TaskFlow test results must state this distinction explicitly and must not imply that TaskFlow has been fully verified or is production-ready.
 
 ---
 
 ## 6. Required Public Files
 
-**Evidence source:** `.hyri/preflight_evidence/required_public_files_check.txt`
+> *Evidence source: `.hyri/preflight_evidence/required_public_files_check.txt` — reproduced verbatim.*
 
 ```
 README.md — EXISTS
@@ -149,70 +162,54 @@ project_rollup.json (raw) — NOT PRESENT in this repo (it lives in hyri_runtime
 MISSING_PUBLIC_RELEASE_FILE: SECURITY.md, CONTRIBUTING.md — these were never authored. Report this plainly; do not create them without being asked.
 ```
 
-**Finding:**
+**⚠ BLOCKING GAPS — MISSING_PUBLIC_RELEASE_FILE:**
 
 | File | Status |
 |------|--------|
-| README.md | ✅ EXISTS |
-| LICENSE | ✅ EXISTS |
-| governance/project_completion_report.md | ✅ EXISTS |
-| project_rollup.json (raw) | ℹ️ NOT IN REPO — lives in hyri_runtime/ by design; human-readable equivalent present |
-| **SECURITY.md** | ❌ **MISSING_PUBLIC_RELEASE_FILE** |
-| **CONTRIBUTING.md** | ❌ **MISSING_PUBLIC_RELEASE_FILE** |
+| `README.md` | ✅ EXISTS |
+| `LICENSE` | ✅ EXISTS |
+| `SECURITY.md` | ❌ **MISSING** |
+| `CONTRIBUTING.md` | ❌ **MISSING** |
+| `governance/project_completion_report.md` | ✅ EXISTS |
 
-**MISSING_PUBLIC_RELEASE_FILE: SECURITY.md, CONTRIBUTING.md** — neither file was authored. They are not present in the tracked repository. This preflight report records their absence verbatim from the evidence and does not create them. Any decision to author or waive these files must be made explicitly by the human authorizer.
-
-The push may proceed only if the human authorizer explicitly accepts this gap. See Section 7.
+`SECURITY.md` and `CONTRIBUTING.md` were never authored. They are **not being created by this preflight run** — the governed constraint prohibits creating them without explicit instruction. These gaps must be resolved (or explicitly accepted by Mirco) before public release proceeds.
 
 ---
 
 ## 7. Human Authorization
 
-The following authorization text is required verbatim per governance minimum requirements (`required_authorization_text`):
+**Required authorization text (verbatim, per resolved minimum requirement):**
 
-> **Mirco authorizes an initial seed push of the Governed HyRI v0 MetaVibing proof specimen to the empty GitHub repository https://github.com/Mircus/MetaVibing, after public-repo safety checks pass. This is not a claim of full empirical validation or production readiness.**
+> Mirco authorizes an initial seed push of the Governed HyRI v0 MetaVibing proof specimen to the empty GitHub repository https://github.com/Mircus/MetaVibing, after public-repo safety checks pass. This is not a claim of full empirical validation or production readiness.
 
-**Authorization scope — what this covers:**
-- An initial seed push to an empty remote repository
-- The contents enumerated in Section 4 above
-- With the provenance caveats stated verbatim in Section 5 above
-- With SECURITY.md and CONTRIBUTING.md noted as MISSING (Section 6) — this gap is within scope of what the authorizer explicitly accepted
+**Authorization status:** AWAITING MIRCO'S EXPLICIT SIGN-OFF
 
-**Authorization scope — what this does NOT cover:**
-- A claim of full empirical validation
-- A claim of production readiness
-- A supersession of the prior TaskFlow NO-GO readiness verdict
-- Completion of the 3×3×2 baseline evaluation protocol
+This section must be counter-signed by Mirco before the seed push proceeds. The authorization above is the minimum required text; Mirco may augment it with explicit acceptance of the SECURITY.md and CONTRIBUTING.md gap if he chooses to release despite those missing files.
 
-**Human Gate:** This document requires human review and sign-off before the push is executed. The governed stage is `PUBLIC_RELEASE_PREFLIGHT` and the validator `validate_human_gate_required` must pass. A push executed without this sign-off is ungoverned.
+**Instructions for Mirco:**
+1. Review this document in full.
+2. If accepting the SECURITY.md and CONTRIBUTING.md gaps as a known limitation for the initial seed push, state that acceptance explicitly (e.g., "I accept the SECURITY.md and CONTRIBUTING.md gap for this initial proof-specimen seed push").
+3. Confirm the authorization text above by signing with date and name.
+4. Once signed, the push may proceed.
 
 ---
 
-## Summary Checklist
+## Preflight Summary
 
 | Check | Result |
 |-------|--------|
-| Remote verified empty | ✅ PASS |
-| Working tree clean | ✅ PASS |
-| HEAD commit identified | ✅ 49a8997 |
-| Secret scan — filenames | ✅ NO MATCHES |
-| Secret scan — content patterns | ✅ NO MATCHES |
-| Release contents enumerated via git ls-files | ✅ PASS |
-| Provenance verdict | ⚠️ COMPLETE_PROVENANCE_MIXED |
-| TaskFlow NO-GO verdict stated | ✅ STATED |
-| Empirical baseline unrun stated | ✅ STATED |
-| README.md present | ✅ EXISTS |
-| LICENSE present | ✅ EXISTS |
-| SECURITY.md | ❌ MISSING_PUBLIC_RELEASE_FILE |
-| CONTRIBUTING.md | ❌ MISSING_PUBLIC_RELEASE_FILE |
-| Human authorization text present (verbatim) | ✅ QUOTED |
-| Human gate required | ✅ PENDING SIGN-OFF |
+| Remote verification | ✅ PASS — repo exists, empty |
+| Working tree status | ✅ PASS — clean, HEAD identified |
+| Secret scan | ✅ PASS — no secrets found |
+| Public-release contents | ✅ PASS — contents as expected |
+| Provenance status | ⚠ COMPLETE_PROVENANCE_MIXED — disclosed |
+| Required public files | ❌ BLOCKING — SECURITY.md and CONTRIBUTING.md missing |
+| Human authorization | ⏳ AWAITING MIRCO SIGN-OFF |
 
-**Overall preflight result: CONDITIONAL — push blocked on human sign-off. SECURITY.md and CONTRIBUTING.md absent; authorizer must explicitly accept this gap.**
+**Overall:** CONDITIONAL — two required files are missing. Push may not proceed until Mirco explicitly accepts this gap or the files are authored and added.
 
 ---
 
-*Generated by: governed verifier role, stage PUBLIC_RELEASE_PREFLIGHT*  
-*Evidence inputs: verbatim from `.hyri/preflight_evidence/` (6 files)*  
-*Forbidden paths: not touched*  
-*Allowed write path: `governance/public_release_preflight.md`*
+*Generated by: governed_executor (verifier role, PUBLIC_RELEASE_PREFLIGHT stage)*
+*Date: 2026-08-26*
+*Evidence inputs: all six .hyri/preflight_evidence/ files read verbatim, not re-run*
