@@ -1,5 +1,7 @@
 # Hooks
 
+**Status: PLANNED — no hooks are implemented in this repository yet.**
+
 Claude Code hooks allow you to run deterministic checks at specific points in the agent lifecycle. Unlike rules and CLAUDE.md, hooks do not rely on the model's attention or discretion — they run unconditionally.
 
 ## Available Hook Points

@@ -6,11 +6,11 @@ This is the MetaVibing companion repository. It contains a practical manual, run
 
 ## Architecture
 
-- **Demo application**: `examples/taskflow/` — FastAPI + SQLite + pytest
-- **Meta-code artifacts**: `claude/` — rules, skills, agents, hooks
-- **MCP tools**: `mcp/architecture-checker/` — external capabilities
-- **Evaluation framework**: `evals/` — tasks, graders, baselines, results
-- **Experiments**: `experiments/` — numbered chapter experiments
+- **Demo application**: `examples/taskflow/` — FastAPI + SQLite + pytest (live)
+- **Meta-code artifacts**: `claude/` — rules, skills (live); agents (partial); hooks (planned, none implemented yet)
+- **MCP tools**: `mcp/architecture-checker/` — live as a standalone CLI; MCP server wrapper is planned for v1.1
+- **Evaluation framework**: `evals/baseline/` — charter written (live); the 18-trial run and `tasks/`/`graders/`/`results/` are planned, not yet executed or created
+- **Experiments**: `experiments/` — planned, described in the book, does not exist in this repository yet
 
 ---
 
@@ -78,14 +78,14 @@ When you observe a pattern of repeated mistakes:
 
 ## Meta-Stack Reference
 
-| Artifact | Purpose | Location |
-|----------|---------|----------|
-| CLAUDE.md | Persistent doctrine | `./CLAUDE.md` |
-| Rules | Path-scoped context | `claude/rules/` |
-| Skills | Reusable procedures | `claude/skills/` |
-| Agents | Specialist subagents | `claude/agents/` |
-| Hooks | Hard behavioral boundaries | `claude/hooks/` |
-| MCP tools | External capabilities | `mcp/` |
+| Artifact | Purpose | Location | Status |
+|----------|---------|----------|--------|
+| CLAUDE.md | Persistent doctrine | `./CLAUDE.md` | Live |
+| Rules | Path-scoped context | `claude/rules/` | Live |
+| Skills | Reusable procedures | `claude/skills/` | Live |
+| Agents | Specialist subagents | `claude/agents/` | Partial |
+| Hooks | Hard behavioral boundaries | `claude/hooks/` | Planned — none implemented yet |
+| MCP tools | External capabilities | `mcp/` | Partial — architecture-checker is a standalone CLI; MCP wrapper planned for v1.1 |
 
 ---
 
