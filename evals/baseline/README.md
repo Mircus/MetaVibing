@@ -81,9 +81,11 @@ Three metrics are collected per condition, per task (D4):
 
 ### M3 — Pytest Pass Rate on First Submission (tertiary)
 
-**Definition:** Percentage of baseline tasks where `pytest` passes on first Claude submission, with no human correction.
+**Definition:** Percentage of Condition B task-trials (3 tasks × 3 trials = 9 total) where `pytest` passes on first Claude submission, with no human correction.
 
-**Threshold:** **≥ 80% (at least 2 of 3 tasks) under Condition B.**
+**Threshold:** **≥ 8 of 9 Condition B task-trials (≈88.9%).**
+
+*(Correction, 2026-09-03: the original text — "≥80% (at least 2 of 3 tasks)" — was internally contradictory; 2/3 is 66.7%, not 80%, and no value at 3-task granularity equals 80% at all. Redefined at 9-trial granularity to match how M1 is already counted, and because it's the only reading where "≥80%" is achievable as a distinct value from "all trials pass.")*
 
 **Note:** All 8 baseline tests currently pass with no MetaVibing artifacts active. This rate is expected to drop when task prompts exercise the intentional quirks. The v1 threshold is set for *Condition B performance*, not baseline fidelity.
 
@@ -201,7 +203,7 @@ The following outcomes do **not** satisfy the v1 release criteria, regardless of
 | **Status summary only** | A report describing what the eval will measure, without actually running it, is not an eval result. |
 | **Scaffold only** | A directory structure with empty files or placeholder content is not a baseline measurement. |
 | **Pytest passing under Condition A alone** | Passing tests with no MetaVibing artifacts proves nothing about the discipline's effect. |
-| **M3 ≥ 80% but M1 violations > 2** | Test passage without architectural discipline is a partial result, not a gate pass. |
+| **M3 threshold met (≥8/9) but M1 violations > 2** | Test passage without architectural discipline is a partial result, not a gate pass. |
 | **Condition B run without a verifiable Condition A baseline** | The claim is comparative. Condition B results alone cannot confirm uplift. |
 | **Human grading of diffs not saved** | Grading that cannot be reproduced by a second reviewer does not meet the reproducibility standard. |
 | **Forbidden paths touched** | Any changes under `book/`, `examples/taskflow/src/`, `examples/taskflow/tests/`, `mcp/`, `claude/`, `.github/`, or `governance/` during an eval run invalidate that run. |
