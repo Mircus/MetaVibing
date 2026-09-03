@@ -33,9 +33,9 @@ Repeated meta-maintenance       →  MetaAgent
 
 ## Status
 
-**Implemented now:** the manual draft (Markdown), the TaskFlow sandbox app with a passing pytest suite, `CLAUDE.md` doctrine, path-scoped rules, the architecture-checker (as a standalone CLI), the evaluation charter (design only), and the Friction Ledger template.
+**Implemented now:** the manual draft (Markdown), the TaskFlow sandbox app with a passing pytest suite, `CLAUDE.md` doctrine, the `.claude/` meta-stack (Rules and Skills natively loaded, an Agent with enforced read-only tools), the architecture-checker (as a standalone CLI, with unit tests and a real violation baseline), the evaluation charter (frozen protocol, not yet run), and 5 real Friction Ledger entries from this repository's own history.
 
-**Not implemented yet:** hooks, the MCP server wrapper for the architecture-checker, the `experiments/`/`patterns/`/`templates/` directories described in the book, and — most importantly — the 18-trial baseline evaluation itself. The charter defines what would count as evidence; no trial has been run, and the Friction Ledger has zero entries. Nothing in this repo should be read as an empirical result yet.
+**Not implemented yet:** hooks, the MCP server wrapper for the architecture-checker, a fresh-clone confirmation that the `.claude/` Skills/Agent actually load in a real Claude Code session, the `experiments/`/`patterns/`/`templates/` directories described in the book, and — most importantly — the 18-trial baseline evaluation itself. The charter defines what would count as evidence; no trial has been run. Nothing in this repo should be read as an empirical result yet.
 
 This section exists so the structure below and the Quick Start links describe what is actually here, not the eventual destination.
 
@@ -48,7 +48,7 @@ claude-metavibing/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md
-├── FRICTION_LEDGER.md            # live — template only, no entries yet
+├── FRICTION_LEDGER.md            # live — 5 closed entries from this repo's own history
 │
 ├── book/                         # live
 │   ├── MetaVibing_Provisional_Booklet_v2.md      # current draft (Markdown only)
@@ -63,10 +63,10 @@ claude-metavibing/
 │       ├── README.md
 │       └── requirements.txt
 │
-├── claude/                       # meta-code artifacts
+├── .claude/                      # meta-code artifacts — Claude Code's native config, not documentation
 │   ├── rules/                    # live
 │   ├── skills/                   # live — /meta, /ship-change
-│   ├── agents/                   # partial
+│   ├── agents/                   # partial — final-reviewer
 │   └── hooks/                    # planned — none implemented yet
 │
 ├── mcp/
@@ -118,10 +118,10 @@ pytest
 ### 3. Explore the Meta-Stack
 
 - **CLAUDE.md** — persistent project doctrine for Claude · live
-- **claude/rules/** — path-scoped contextual rules · live
-- **claude/skills/** — reusable procedural Skills · live
-- **claude/agents/** — specialist subagent definitions · partial
-- **claude/hooks/** — deterministic behavioral guardrails · planned, none implemented yet
+- **.claude/rules/** — path-scoped contextual rules · live
+- **.claude/skills/** — reusable procedural Skills · live
+- **.claude/agents/** — specialist subagent definitions · partial
+- **.claude/hooks/** — deterministic behavioral guardrails · planned, none implemented yet
 
 ### 4. Track Friction
 
@@ -133,7 +133,7 @@ Every recurring Claude failure gets logged in [`FRICTION_LEDGER.md`](FRICTION_LE
 
 *MetaVibing: Engineering Agents That Improve Their Own Working Environment*
 
-**14 parts, 50+ sections:**
+**16 parts, 50+ sections:**
 
 | Part | Topic |
 |------|-------|
@@ -151,6 +151,8 @@ Every recurring Claude failure gets logged in [`FRICTION_LEDGER.md`](FRICTION_LE
 | XII | The Complete MetaVibing Session |
 | XIII | The MetaVibing Starter Kit |
 | XIV | The Central Discipline |
+| XV | Worked Example: The Bridle Pattern |
+| XVI | MetaVibing as a Proof Specimen |
 
 ---
 
@@ -170,4 +172,4 @@ MIT — see [LICENSE](LICENSE)
 
 ---
 
-*Edition 1.0 — August 2026*
+*MetaVibing — Provisional Research Preview — September 2026*

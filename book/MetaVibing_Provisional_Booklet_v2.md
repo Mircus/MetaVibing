@@ -1430,7 +1430,7 @@ examples/taskflow/
 - SQLite is the only permitted database for the sandbox project.
 ```
 
-`claude/rules/taskflow.md` scopes that constraint specifically to `examples/taskflow/`, and adds
+`.claude/rules/taskflow.md` scopes that constraint specifically to `examples/taskflow/`, and adds
 testing and dependency discipline:
 
 ```
@@ -1472,7 +1472,7 @@ breaking any of the 8 tests in `tests/test_tasks.py`.
 
 ### Step Three — /meta and /ship-change
 
-`claude/skills/ship-change/SKILL.md` implements the disciplined change procedure described in
+`.claude/skills/ship-change/SKILL.md` implements the disciplined change procedure described in
 Part IV, with a six-step procedure ending in a mandatory report:
 
 ```
@@ -1483,12 +1483,12 @@ Diff size: +N / -N lines
 Notes: <anything the human should know>
 ```
 
-`claude/skills/meta/SKILL.md` implements `/meta` — the self-audit skill Part III, Step Three
+`.claude/skills/meta/SKILL.md` implements `/meta` — the self-audit skill Part III, Step Three
 describes, scoped to inspect CLAUDE.md, rules, and the friction ledger for gaps.
 
 ### Step Four — A Read-Only Reviewer
 
-`claude/agents/final-reviewer.md` is a specialist subagent with no write access. Its checklist
+`.claude/agents/final-reviewer.md` is a specialist subagent with no write access, enforced by its `tools: Read, Grep, Glob` frontmatter rather than only stated in prose. Its checklist
 covers correctness, scope discipline, and — specifically for this repository —
 "Is database access only in the repository layer (for taskflow/)?" It cannot fix a violation
 it finds. It can only say `REJECTED` and name it. That separation of powers is the entire point
@@ -1498,12 +1498,15 @@ of Part V's Builder/Critic pattern, made concrete.
 
 `mcp/architecture-checker/checker.py` is the "add one missing tool" step made real. It is a
 plain, dependency-free Python script using `ast` to walk route handlers and flag direct
-`session.*` calls — the exact rule from `claude/rules/taskflow.md`, now enforced mechanically
+`session.*` calls — the exact rule from `.claude/rules/taskflow.md`, now enforced mechanically
 instead of by reminder:
 
 ```bash
-python mcp/architecture-checker/checker.py examples/taskflow/src/
+python mcp/architecture-checker/checker.py examples/taskflow
 ```
+
+(project root, not `src/` — passing `src/` silently disables the missing-test check; this was a
+real bug in the checker, fixed 2026-09-03.)
 
 At the time of writing, this repository has not yet wrapped the script as an MCP server (no
 `mcp.json` manifest exists) — it works as a standalone CLI only. That gap is itself an honest
@@ -2183,6 +2186,13 @@ It is a destination that should emerge from actual friction.
 
 ## Worked Example: What This Repository Actually Has
 
+*(Updated 2026-09-03 — the version of this section that shipped with the original v2 draft was
+already stale within a week: it called `evals/`, `experiments/`, `patterns/`, and `templates/`
+"scaffolded, empty," described `claude/` with no leading dot, and omitted the Skills/Agent/Rule
+frontmatter question entirely. A worked example titled "what this repository actually has" that
+stops matching the repository is exactly the failure this section exists to name — so it gets
+corrected in place, not left as a period artifact.)*
+
 The tree above is a destination, deliberately larger than any real Day One repository should be.
 Here is what this repository — the one containing this book — actually has today, for honest
 comparison:
@@ -2192,9 +2202,11 @@ Metavibing/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md
-├── FRICTION_LEDGER.md
+├── FRICTION_LEDGER.md           # template only, no entries yet
 │
 ├── book/
+│   ├── MetaVibing_Provisional_Booklet_v2.md   # this document
+│   ├── MetaVibing_Provisional_Booklet_v1.{md,docx,pdf}
 │   └── metavibing-manual.md
 │
 ├── examples/
@@ -2204,33 +2216,34 @@ Metavibing/
 │       ├── README.md
 │       └── requirements.txt
 │
-├── claude/                      # no leading dot in this repo
+├── .claude/                     # Claude Code's native config — this is what actually loads
 │   ├── rules/
-│   │   └── taskflow.md
+│   │   └── taskflow.md          # globs: examples/taskflow/**/*
 │   ├── skills/
 │   │   ├── meta/SKILL.md
 │   │   └── ship-change/SKILL.md
 │   ├── agents/
-│   │   └── final-reviewer.md
+│   │   └── final-reviewer.md    # tools: Read, Grep, Glob — read-only enforced by frontmatter
 │   └── hooks/
 │       └── README.md            # documents intent; no hook script yet
 │
 ├── mcp/
 │   └── architecture-checker/
-│       └── checker.py           # working CLI; not yet wrapped as MCP
+│       ├── checker.py           # working CLI; not yet wrapped as MCP
+│       └── test_checker.py
 │
-├── evals/                       # scaffolded, empty
-├── experiments/                 # scaffolded, empty
-├── patterns/                    # scaffolded, empty
-└── templates/                   # scaffolded, empty
+├── evals/
+│   └── baseline/README.md       # the frozen evaluation charter — the 18-trial run has not happened
+│
+└── governance/                  # Governed HyRI v0 provenance records
 ```
 
-Two honest gaps, named rather than hidden: `claude/hooks/` describes a hook it does not yet
-implement, and four directories exist only as scaffolding with no content. Under this book's own
-doctrine (Part X, "The Giant CLAUDE.md" and its neighboring failure modes), an empty directory
-that implies finished work is worse than no directory at all — it is a small instance of exactly
-the failure this book spends an entire part warning against. Naming the gap here, in the book
-itself, is the correction.
+`experiments/`, `patterns/`, and `templates/` are not present at all — not even as scaffolding.
+The original version of this section called them "scaffolded, empty," which was itself a smaller
+version of the same failure: an empty directory that implies finished work is worse than no
+directory at all. This repository now takes the stricter position — don't create the directory
+until real content earns it. Under this book's own doctrine (Part X, "The Giant CLAUDE.md" and its
+neighboring failure modes), that's the correction, not a compromise.
 
 ## Part IX — Diagnostic Commands for MetaVibers
 
@@ -2848,13 +2861,13 @@ The following things have been concretely demonstrated as of this edition:
 
 **The evaluation charter exists and is anchored to resolved human decisions.** The `evals/baseline/README.md` document specifies the core claim, target user, baseline tasks, metrics, protocol, pass/fail gates, and non-success criteria — all traceable to D1–D8. It is not a scaffold; it contains specific numeric thresholds, specific task IDs, and specific exclusion criteria.
 
-**The MetaVibing meta-stack exists as runnable artifacts.** The companion repository contains:
+**The MetaVibing meta-stack exists as runnable artifacts.** *(Correction, 2026-09-03: this claim was false when first written. The files existed but lived under `claude/` — not `.claude/` — and had no YAML frontmatter, so Claude Code could not actually load any of them as Skills, an Agent, or Rules. They were prose about the stack, not the stack. Fixed by moving each artifact to the path and frontmatter Claude Code actually requires; the claim below is true as of this correction, not as of the original edition.)* The companion repository contains:
 - `CLAUDE.md` with architectural constraints
-- `claude/rules/taskflow.md` with path-scoped rules
-- `claude/skills/ship-change/SKILL.md` with a disciplined change procedure
-- `claude/skills/meta/SKILL.md` implementing `/meta`
-- `claude/agents/final-reviewer.md` as a read-only specialist subagent
-- `mcp/architecture-checker/checker.py` as a standalone architecture validator
+- `.claude/rules/taskflow.md` with path-scoped rules (`globs:` frontmatter)
+- `.claude/skills/ship-change/SKILL.md` with a disciplined change procedure (`name:`/`description:` frontmatter)
+- `.claude/skills/meta/SKILL.md` implementing `/meta`
+- `.claude/agents/final-reviewer.md` as a read-only specialist subagent (`tools: Read, Grep, Glob` frontmatter — enforced, not just stated)
+- `mcp/architecture-checker/checker.py` as a standalone architecture validator, plus `test_checker.py` covering it
 
 **The failure modes documented in this book are real and have occurred.** Part XV is not a hypothetical. The object substitution failure happened during the production of this repository. The Bridle pattern described there is a real response to a real incident, implemented in `.hyri/`.
 

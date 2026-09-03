@@ -1,13 +1,13 @@
 # MetaVibing — Project Operating Instructions
 
-This is the MetaVibing companion repository. It contains a practical manual, runnable examples, experiments, templates, benchmarks, and progressively more sophisticated agent architectures for engineering agents that improve their own working environment.
+This is the MetaVibing companion repository. It contains a practical manual and a runnable example (TaskFlow) for engineering agents that improve their own working environment. `experiments/`, `templates/`, and published benchmarks are the book's described destination, not yet present here — see README Status.
 
 ---
 
 ## Architecture
 
 - **Demo application**: `examples/taskflow/` — FastAPI + SQLite + pytest (live)
-- **Meta-code artifacts**: `claude/` — rules, skills (live); agents (partial); hooks (planned, none implemented yet)
+- **Meta-code artifacts**: `.claude/` — rules, skills (live); agents (partial); hooks (planned, none implemented yet). This is the executable configuration Claude Code natively loads — not a separate documentation tree.
 - **MCP tools**: `mcp/architecture-checker/` — live as a standalone CLI; MCP server wrapper is planned for v1.1
 - **Evaluation framework**: `evals/baseline/` — charter written (live); the 18-trial run and `tasks/`/`graders/`/`results/` are planned, not yet executed or created
 - **Experiments**: `experiments/` — planned, described in the book, does not exist in this repository yet
@@ -30,7 +30,7 @@ pytest
 
 Run architecture checker (from repo root):
 ```bash
-python mcp/architecture-checker/checker.py examples/taskflow/src/
+python mcp/architecture-checker/checker.py examples/taskflow
 ```
 
 ---
@@ -40,7 +40,7 @@ python mcp/architecture-checker/checker.py examples/taskflow/src/
 - Make the **smallest change** that solves the requested problem.
 - Do **not** refactor unrelated files.
 - Do **not** claim success until relevant verification has run.
-- Do **not** touch `examples/taskflow/` when working on `mcp/` or `claude/`, and vice versa.
+- Do **not** touch `examples/taskflow/` when working on `mcp/` or `.claude/`, and vice versa.
 
 ---
 
@@ -81,10 +81,10 @@ When you observe a pattern of repeated mistakes:
 | Artifact | Purpose | Location | Status |
 |----------|---------|----------|--------|
 | CLAUDE.md | Persistent doctrine | `./CLAUDE.md` | Live |
-| Rules | Path-scoped context | `claude/rules/` | Live |
-| Skills | Reusable procedures | `claude/skills/` | Live |
-| Agents | Specialist subagents | `claude/agents/` | Partial |
-| Hooks | Hard behavioral boundaries | `claude/hooks/` | Planned — none implemented yet |
+| Rules | Path-scoped context | `.claude/rules/` | Live |
+| Skills | Reusable procedures | `.claude/skills/` | Live |
+| Agents | Specialist subagents | `.claude/agents/` | Partial |
+| Hooks | Hard behavioral boundaries | `.claude/hooks/` | Planned — none implemented yet |
 | MCP tools | External capabilities | `mcp/` | Partial — architecture-checker is a standalone CLI; MCP wrapper planned for v1.1 |
 
 ---

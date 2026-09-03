@@ -49,7 +49,7 @@ taskflow/
 
 ## Baseline Tasks (evals/)
 
-The following tasks are given to vanilla Claude Code before any MetaVibing intervention. Results are recorded in `evals/baseline/`.
+The following tasks are given to vanilla Claude Code before any MetaVibing intervention. The evaluation charter and thresholds live in `evals/baseline/README.md`; per-trial results are recorded under `evals/results/<task-id>/<condition>/<trial-n>/` (see the charter, §5.5).
 
 1. Add pagination to `GET /tasks/`
 2. Fix the failing authentication test (to be added)
