@@ -25,7 +25,7 @@ global_goal: >
 
 source_artifacts:
   - id: original_manual_docx
-    path: The Claude MetaVibing Manual.docx
+    path: book/The Claude MetaVibing Manual.docx
     role: original_manual
     required: true
   - id: booklet_v1
@@ -44,9 +44,8 @@ final_deliverables:
     path: book/MetaVibing_Provisional_Booklet_v2.md
     # Governance-anchored expansion of v1: quotes the resolved core claim
     # verbatim, includes a Claims-to-Evidence table, marks results TBD
-    # until real eval trials exist. Not yet produced — blocked on API
-    # credits as of 2026-08-24, contract/gate already approved by
-    # Strategic Devil.
+    # until real eval trials exist. DELIVERED 2026-08-25 (EXPANDED_DRAFT,
+    # approved by Mirco) — see run_registry.json / project_rollup.json.
   - id: eval_baseline_charter
     path: evals/baseline/README.md
     # DELIVERED 2026-08-24 — real governed PASS, validators confirmed.
@@ -64,7 +63,8 @@ final_deliverables:
   - id: taskflow_test_metadata
     path: examples/taskflow/test_logs/taskflow_tests.meta.json
     # Execution provenance: command, cwd, exit_code, timestamps,
-    # stdout_sha256, generated_by. Not yet produced by the executor.
+    # stdout_sha256, generated_by. PASSED (Option D governed_execution,
+    # taskflow_pytest_governed_v1) — see run_registry.json.
 
 failure_conditions:
   - raw_markdown_only

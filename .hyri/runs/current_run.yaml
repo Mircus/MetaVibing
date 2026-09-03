@@ -1,37 +1,22 @@
 schema_version: governed_hyri_run_v0
-run_id: public_release_preflight_v2
+run_id: initial_seed_push_v3
 profile: booklet_plus_repo_v0
-stage: PUBLIC_RELEASE_PREFLIGHT
-role: verifier
+stage: INITIAL_SEED_PUSH
+stage_type: governed_execution
+role: executor
 active_object:
-  id: public_release_preflight
-  path: governance/public_release_preflight.md
+  id: initial_seed_push
+  path: governance/push_logs/initial_seed_push.txt
 
-inputs:
-  - path: .hyri/preflight_evidence/remote_verification.txt
-    role: remote_verification_evidence
-    required: true
-  - path: .hyri/preflight_evidence/working_tree_status.txt
-    role: working_tree_evidence
-    required: true
-  - path: .hyri/preflight_evidence/preflight_scan_evidence.txt
-    role: secret_scan_evidence
-    required: true
-  - path: .hyri/preflight_evidence/public_release_contents.txt
-    role: release_contents_evidence
-    required: true
-  - path: .hyri/preflight_evidence/provenance_status.txt
-    role: provenance_evidence
-    required: true
-  - path: .hyri/preflight_evidence/required_public_files_check.txt
-    role: required_files_evidence
-    required: true
+inputs: []
 
 required_outputs:
-  - path: governance/public_release_preflight.md
+  - path: governance/push_logs/initial_seed_push.txt
+  - path: governance/push_logs/initial_seed_push.meta.json
 
 allowed_write_paths:
-  - governance/public_release_preflight.md
+  - governance/push_logs/initial_seed_push.txt
+  - governance/push_logs/initial_seed_push.meta.json
 
 forbidden_paths:
   - README.md
@@ -46,41 +31,29 @@ forbidden_paths:
   - governance/adoptions/
   - governance/decision_brief_dec-e84f9216.md
   - governance/project_completion_report.md
-  - .hyri/preflight_evidence/
+  - governance/archive/public_release_preflight.md
+  - .hyri/
 
 does_not_count:
-  - independently re-running git commands instead of using the supplied evidence inputs verbatim
-  - claiming full readiness/empirical validation
-  - claiming all artifacts share the same provenance
-  - paraphrasing Mirco's authorization instead of quoting it verbatim
-  - creating or modifying any file other than the declared active_object
-  - omitting the SECURITY.md or CONTRIBUTING.md sha256 hash
-  - describing PUBLIC_RELEASE_FILES as a clean native governed run rather than a revalidated recovery stage
+  - treating this run as a mutation of initial_seed_push_v1 or initial_seed_push_v2
+  - claiming the 2026-08-27 credential-leak incident never happened
+  - retrying without the credential-redaction / GIT_TERMINAL_PROMPT=0 fix having been deployed first
+  - reusing the previously-authorized scoped sslVerify=false exception now that the proper CA fix is confirmed working
+  - creating or modifying any file other than the two declared execution log paths
 
 success_validators:
-  - validate_required_outputs_exist
-  - validate_required_sections_present
-  - validate_preflight_authorization_quoted
-  - validate_preflight_no_real_secrets_present
-  - validate_human_gate_required
+  - validate_test_log_exists
+  - validate_execution_metadata_exists
+  - validate_execution_exit_code_zero
   - validate_no_forbidden_paths_touched
 
-minimum_requirements:
-  required_sections:
-    - "Remote Verification"
-    - "Working Tree Status"
-    - "Secret"
-    - "Public-Release Contents"
-    - "Provenance Status"
-    - "Required Public Files"
-    - "Human Authorization"
-    - "a9b601f758da3958f6a432011c8888f38c547b949a3c8cadfe267635a222244b"
-    - "7ff1b5ad198a85ada428f474ad126ba3dc6a529140b54c8a2726425023bfb143"
-  required_authorization_text: >-
-    Mirco authorizes an initial seed push of the Governed HyRI v0 MetaVibing
-    proof specimen to the empty GitHub repository
-    https://github.com/Mircus/MetaVibing, after public-repo safety checks
-    pass. This is not a claim of full empirical validation or production
-    readiness.
+minimum_requirements: {}
+
+execution:
+  cwd: "."
+  command: "git -c http.sslVerify=true -c core.hooksPath=/dev/null push --porcelain --no-verify origin main"
+  timeout_seconds: 60
+  stdout_log: governance/push_logs/initial_seed_push.txt
+  metadata_log: governance/push_logs/initial_seed_push.meta.json
 
 human_gate_after: true

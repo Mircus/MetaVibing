@@ -1,111 +1,133 @@
-# Real architecture-checker run against examples/taskflow/src/
-# Command: python mcp/architecture-checker/checker.py examples/taskflow/src/
-# Date: 2026-08-23
+# Real architecture-checker baseline against examples/taskflow (repaired checker, project-root invocation)
+# Command: python mcp/architecture-checker/checker.py examples/taskflow
+# Date: 2026-09-03
+# This is the intentional baseline: TaskFlow is deliberately born imperfect.
+# PR gate: fail only if a PR increases the violation count above this baseline
+# or introduces a violation class not already present here.
 
 {
-  "violations": 17,
+  "violations": 20,
   "files": [
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 41,
       "snippet": "session.add() in route handler 'create_user'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 42,
       "snippet": "session.commit() in route handler 'create_user'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 43,
       "snippet": "session.refresh() in route handler 'create_user'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 49,
       "snippet": "session.exec() in route handler 'list_users'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 54,
       "snippet": "session.get() in route handler 'get_user'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 65,
       "snippet": "session.add() in route handler 'create_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 66,
       "snippet": "session.commit() in route handler 'create_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 67,
       "snippet": "session.refresh() in route handler 'create_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 80,
       "snippet": "session.exec() in route handler 'list_tasks'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 85,
       "snippet": "session.get() in route handler 'get_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 93,
       "snippet": "session.get() in route handler 'complete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 97,
       "snippet": "session.add() in route handler 'complete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 98,
       "snippet": "session.commit() in route handler 'complete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 99,
       "snippet": "session.refresh() in route handler 'complete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 105,
       "snippet": "session.get() in route handler 'delete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 108,
       "snippet": "session.delete() in route handler 'delete_task'"
     },
     {
-      "file": "main.py",
+      "file": "src/main.py",
       "rule": "db-in-handler",
       "line": 109,
       "snippet": "session.commit() in route handler 'delete_task'"
+    },
+    {
+      "file": "src/database.py",
+      "rule": "missing-test",
+      "line": 0,
+      "snippet": "No test file found for module 'database'"
+    },
+    {
+      "file": "src/main.py",
+      "rule": "missing-test",
+      "line": 0,
+      "snippet": "No test file found for module 'main'"
+    },
+    {
+      "file": "src/models.py",
+      "rule": "missing-test",
+      "line": 0,
+      "snippet": "No test file found for module 'models'"
     }
-  ]
+  ],
+  "errors": []
 }

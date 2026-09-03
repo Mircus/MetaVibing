@@ -1,21 +1,27 @@
 """
-architecture_check — MetaVibing MCP Tool
+architecture_check — MetaVibing standalone CLI
 
 Analyzes a FastAPI/SQLModel project and reports architectural violations.
-Specifically checks for the patterns demonstrated in the MetaVibing manual:
+Standalone CLI only — there is no MCP server wrapper yet (planned for
+v1.1; see CLAUDE.md's Meta-Stack Reference).
 
+Implemented checks:
 - Database access in route handlers (instead of repository layer)
-- Domain logic mixed with transport layer
 - Missing test files for source modules
+
+Not yet implemented (do not advertise as available):
+- Domain logic mixed with transport layer
 - Undeclared dependencies
 
-Usage (standalone):
-    python checker.py <path-to-src-directory>
+Usage:
+    python checker.py <path-to-project-root>
 
-Usage (via MCP):
-    Call the `architecture_check` tool with {"path": "<src-dir>"}
+Pass the project root (the directory containing both `src/` and
+`tests/`), not `src/` directly — `tests/` is resolved relative to the
+argument, so passing `src/` silently makes the missing-test check see
+zero violations.
 
-Returns JSON:
+Returns JSON on stdout:
     {
         "violations": <count>,
         "files": [
@@ -25,8 +31,14 @@ Returns JSON:
                 "line": <line-number>,
                 "snippet": "<offending-code>"
             }
+        ],
+        "errors": [
+            {"file": "<relative-path>", "error": "<parse error message>"}
         ]
     }
+
+Exit code: 0 if zero violations and zero parse errors, 1 otherwise
+(use --fail-on-violation is implicit; there is no silent-success mode).
 """
 import ast
 import json
@@ -39,18 +51,17 @@ from typing import Any
 # ── Rules ─────────────────────────────────────────────────────────────────────
 
 
-def check_db_in_handlers(source: str, rel_path: str) -> list[dict[str, Any]]:
+def check_db_in_handlers(tree: ast.AST, rel_path: str) -> list[dict[str, Any]]:
     """
     Detect direct database Session usage inside route handler functions.
     In a clean architecture, route handlers should call repository functions,
     not query the database directly.
+
+    Takes an already-parsed AST — callers are responsible for parsing and
+    reporting SyntaxError separately, rather than treating a parse failure
+    as "zero violations."
     """
     violations = []
-    try:
-        tree = ast.parse(source)
-    except SyntaxError:
-        return violations
-
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             # Check if this looks like a route handler (has HTTP-verb decorator)
@@ -103,22 +114,33 @@ def check_missing_tests(src_dir: Path, tests_dir: Path, rel_src: str) -> list[di
 
 
 def run_checks(project_path: str) -> dict[str, Any]:
+    """
+    project_path must be the project root (containing both src/ and
+    tests/), not src/ directly — tests_dir is resolved relative to it.
+    """
     root = Path(project_path)
     src_dir = root / "src" if (root / "src").exists() else root
     tests_dir = root / "tests"
 
     violations = []
+    errors = []
 
     for py_file in src_dir.rglob("*.py"):
         source = py_file.read_text(encoding="utf-8")
         rel = str(py_file.relative_to(root))
-        violations.extend(check_db_in_handlers(source, rel))
+        try:
+            tree = ast.parse(source)
+        except SyntaxError as e:
+            errors.append({"file": rel, "error": f"SyntaxError: {e}"})
+            continue
+        violations.extend(check_db_in_handlers(tree, rel))
 
     violations.extend(check_missing_tests(src_dir, tests_dir, str(src_dir.relative_to(root))))
 
     return {
         "violations": len(violations),
         "files": violations,
+        "errors": errors,
     }
 
 
@@ -127,8 +149,9 @@ def run_checks(project_path: str) -> dict[str, Any]:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python checker.py <project-path>")
+        print("Usage: python checker.py <project-root>  (root, not src/ — see module docstring)")
         sys.exit(1)
 
     result = run_checks(sys.argv[1])
     print(json.dumps(result, indent=2))
+    sys.exit(0 if result["violations"] == 0 and not result["errors"] else 1)
