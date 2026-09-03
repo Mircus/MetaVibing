@@ -13,7 +13,9 @@ This charter defines what the MetaVibing baseline evaluation covers, how it is r
 > **MetaVibing is a governed workflow discipline for using AI agents as bounded workers under explicit context, artifact, validator, and human-gate controls.**
 > *(D1 — Mirco's resolution)*
 
-In concrete, testable terms: a practitioner who applies the MetaVibing discipline — using CLAUDE.md, path-scoped Rules, Skills, Agents, Hooks, and MCP tools — will produce a higher rate of first-try successes on architecturally constrained tasks, commit fewer repeated architectural violations per session, and require fewer human correction turns per feature request, compared to the same practitioner operating without any MetaVibing artifacts.
+In concrete, testable terms: a practitioner who applies the MetaVibing discipline — using CLAUDE.md, path-scoped Rules, reusable Skills, specialist review (an Agent), and deterministic architectural checking — will produce a higher rate of first-try successes on architecturally constrained tasks, commit fewer repeated architectural violations per session, and require fewer human correction turns per feature request, compared to the same practitioner operating without any MetaVibing artifacts.
+
+*(Scope correction, 2026-09-03: the claim previously named Hooks and MCP tools alongside the rest of the stack. Neither exists in this repository yet — see README Status — so a v1 evaluation cannot test them. Narrowed to the five layers that are actually implemented. Hooks and MCP are candidate v1.1+ interventions, to be evaluated separately once built for a reason the Friction Ledger surfaces, not to fill out the diagram.)*
 
 This is a **quantitative, falsifiable claim**. The evals in this directory exist to test it against a controlled sandbox. If the measured uplift is weak, the claim must be revised — the eval does not exist to confirm the claim; it exists to challenge it.
 
@@ -75,7 +77,9 @@ Three metrics are collected per condition, per task (D4):
 **Definition:** Number of follow-up prompts required to correct Claude's output per task, beyond the initial task prompt.
 
 **Condition A baseline:** expected 3–5 correction turns for architecturally constrained tasks.  
-**Condition B threshold:** **≤ 1.5 correction turns per task** (median across 3 trials).
+**Condition B threshold:** **mean ≤ 1.5 correction turns per task**, averaged across the 3 trials.
+
+*(Correction, 2026-09-03: "median across 3 trials" was mathematically incoherent — the median of three integers is itself an integer, so "≤1.5" was equivalent to "≤1." Switched to mean, which is what a 1.5 threshold actually expresses.)*
 
 **Why:** Correction turns are a direct cost proxy. They are observable and recordable without additional tooling.
 
@@ -105,10 +109,11 @@ Three metrics are collected per condition, per task (D4):
 ### 5.1 Environment
 
 - Fresh Python virtual environment: `python -m venv .venv && source .venv/bin/activate`.
-- Install: `pip install -r examples/taskflow/requirements.txt`.
+- Install: `pip install -r examples/taskflow/requirements.txt`, then freeze it (`pip freeze`) into the trial's saved metadata — don't just trust the pin in `requirements.txt`, record what was actually installed.
 - No external credentials. No project-wide config beyond what is committed.
 - Operating system: Linux or macOS (not Windows — path behaviour untested).
 - LLM API: Claude (current production model at time of run). Model version recorded in run log.
+- **Every task-trial starts from the same frozen commit SHA, in its own disposable git worktree (or clone), destroyed after the trial.** A fresh Claude Code session alone does not guarantee a fresh repository — a previous trial's leftover diff sitting in a shared working tree would contaminate the next one. Record the baseline SHA in `evals/protocol.yaml`; every trial's saved metadata includes the worktree path and the SHA it was created from.
 
 ### 5.2 Conditions
 
@@ -119,16 +124,25 @@ Three metrics are collected per condition, per task (D4):
 
 **Condition B — MetaVibing active:**
 - `CLAUDE.md` populated from the manual's template (full architectural constraints active — see [`CLAUDE.md`](../../CLAUDE.md) for the current canonical version).
-- All path-scoped Rules active (sourced from `claude/rules/`).
-- At least one Skill active: `/ship-change`.
-- Architecture-checker active as standalone CLI grader: `python mcp/architecture-checker/checker.py examples/taskflow/src/` (D6 — relabelled as standalone CLI for v1; MCP server upgrade is a v1.1 item).
+- All path-scoped Rules active (sourced from `.claude/rules/`, loaded natively by Claude Code).
+- At least one Skill active: `/ship-change` (`.claude/skills/ship-change/`).
+- The `final-reviewer` subagent (`.claude/agents/final-reviewer.md`) available for specialist review.
+- Architecture-checker active as standalone CLI grader: `python mcp/architecture-checker/checker.py examples/taskflow` (project root, not `src/` — see the checker's own docstring; D6 — relabelled as standalone CLI for v1; MCP server upgrade is a v1.1 item).
 
 ### 5.3 Trial Design
 
 - **3 tasks × 3 trials × 2 conditions = 18 task-trials total.**
 - Each trial: fresh Claude Code session, task prompt given verbatim (prompts stored in `evals/tasks/`), no prior context except what is in the active CLAUDE.md and Rules.
-- Report **median and worst-case** for M2 and M3 across the 3 trials per task. Report **combined count** for M1 across all 9 Condition B trials.
-- Order of conditions: Condition A first (establishes baseline), then Condition B. Do not interleave.
+- Report **mean and worst-case** for M2, and **pass count and worst-case** for M3, across the 3 trials per task. Report **combined count** for M1 across all 9 Condition B trials.
+- **Condition order is precommitted and counterbalanced per task, not fixed A-then-B.** Running all of Condition A before any of Condition B lets the practitioner's own task-specific learning (not MetaVibing) explain a B-condition improvement. Each task gets its own fixed 6-run order set before any trial starts, and it is not changed based on how earlier trials went:
+
+  | Task | Trial order (A/B), 6 runs = 3×A + 3×B |
+  |------|----------------------------------------|
+  | T1 | A, B, B, A, A, B |
+  | T3 | B, A, A, B, B, A |
+  | T6 | A, B, A, B, A, B |
+
+  This exact table is a placeholder shape illustrating the principle (precommitted, counterbalanced, not experimenter-chosen mid-run) — before the first real trial, regenerate the per-task order with a real RNG, record the seed in `evals/protocol.yaml`, and do not deviate from it once trials begin.
 
 ### 5.4 Grading
 
@@ -144,6 +158,7 @@ Record full output verbatim in `evals/results/`. Pass = all baseline tests green
 - Scores each diff against the explicit constraints in `CLAUDE.md`: one violation count per constraint violated.
 - Records correction turn count (number of follow-up prompts sent before pytest passes or the trial is abandoned).
 - Grading rubric: see `evals/graders/rubric.md` (to be produced in a subsequent charter stage).
+- **Grading is blinded where possible.** The diff is presented to the grader as `Trial <n> / Task <id> / Condition: hidden`, without CLAUDE.md/Rules visible in the diff itself and without the grader having run the trial. Condition is revealed only after the violation count and correction-turn count are recorded, to keep expectation bias out of the primary metric.
 
 ### 5.5 Reproducibility Standard
 
@@ -169,24 +184,40 @@ A second experimenter must be able to reproduce the grading judgment from these 
 
 Before any PR is merged:
 - [ ] `pytest` passes — all 8 baseline tests plus any new tests in the PR.
-- [ ] `python mcp/architecture-checker/checker.py examples/taskflow/src/` reports zero violations.
+- [ ] `python mcp/architecture-checker/checker.py examples/taskflow` reports **no more violations than the committed baseline** (`mcp/architecture-checker/check_logs/taskflow_baseline.json`, currently 20 — TaskFlow is intentionally born with `db-in-handler` and `missing-test` violations; "zero violations" is not an achievable baseline for this sandbox and was never a meaningful gate). Fail if the PR increases the count, or introduces a violation class absent from the baseline.
 - [ ] No new files created under `examples/taskflow/src/` that bypass the repository pattern.
 - [ ] `CLAUDE.md` and any modified Rules are internally consistent (no contradictions).
 
 ### Release v1 gates (required before public announcement)
 
 Before MetaVibing v1 is announced publicly:
-- [ ] **T1, T3, T6 each pass `pytest` under Condition B** (MetaVibing active, median of 3 trials).
+- [ ] **The full 18-trial Condition A vs. Condition B comparison is run and published** in `evals/results/`, including A→B deltas for M1, M2, and M3 — see "Comparative evidence" below. This was previously listed as a v1.1 stretch gate; that was backwards, since the core claim (§1) is explicitly comparative and Condition B results alone cannot confirm it (§7).
+- [ ] **T1, T3, T6 each meet M3 (≥8/9 first-submission pytest passes) under Condition B** — not merely "pass on the mean/median trial." A task passing 6/9 with 3 failures hidden inside an average does not meet the gate.
 - [ ] **Condition B produces ≤ 2 architectural violations total** across T1 + T3 + T6 (combined across all trials).
+- [ ] Grader rubric (`evals/graders/rubric.md`) is documented and grading was blinded per §5.4.
 - [ ] `book/metavibing-manual.md` is human-reviewed and copyedited — not just mechanically extracted.
 - [ ] All companion repo examples run end-to-end from a clean `git clone` with documented setup.
 - [ ] The architecture-checker is documented clearly as a **standalone CLI only** for v1 (MCP server wrapper is a v1.1 item — see D6).
+- [ ] Results are reported and labeled as a **pilot** (one practitioner, 3 tasks) — not broad validation of AI-assisted engineering. See "Pilot, not confirmatory study" below.
 
-### Stretch gate (v1.1)
+### Comparative evidence (why this moved out of "stretch")
 
-- [ ] Condition A vs. Condition B comparison data is recorded in `evals/results/` with full methodology.
-- [ ] Grader rubric (`evals/graders/rubric.md`) is documented and independently validated.
+§1's core claim is stated as comparative — MetaVibing performs *better than the same practitioner without it*. §7 already said "Condition B run without a verifiable Condition A baseline... cannot confirm uplift." A release gate that didn't require the comparison contradicted the charter's own claim and its own non-success table. Report the comparison as three deltas, not a single pass/fail:
+- Δ M1 (Condition A violations − Condition B violations)
+- Δ M2 (Condition A mean correction turns − Condition B mean correction turns)
+- Δ M3 (Condition A pass rate − Condition B pass rate)
+
+No arbitrary "N% better" threshold is imposed for this first run. Report the effect sizes honestly; use them to set a preregistered threshold for a larger confirmatory study, not to retroactively justify this one.
+
+### Pilot, not confirmatory study
+
+3 tasks × 3 trials × 1 practitioner is enough to find out whether there is signal. It is not enough to support a broad claim about AI-assisted engineering — the tasks are also not held out (the artifacts under test were written with knowledge of exactly what these tasks check). Label the published results a **pilot**. A confirmatory follow-up (more tasks, ideally more than one practitioner, at least one held-out task not named in any MetaVibing artifact) is future work, tracked separately — not a blocker for publishing the pilot honestly.
+
+### Deferred to v1.1
+
 - [ ] T2, T4, T5, T7 are runnable and added to the task battery.
+- [ ] Ablations isolating which layer of the stack (CLAUDE.md alone, + a Rule, + a Skill, + the reviewer Agent, + the checker) carries the improvement.
+- [ ] Real MCP server for the architecture-checker, and a first protective Hook — built because a Friction Ledger entry demands one, not to fill out the Meta-Stack diagram.
 
 ### Gate status accounting
 
@@ -206,7 +237,7 @@ The following outcomes do **not** satisfy the v1 release criteria, regardless of
 | **M3 threshold met (≥8/9) but M1 violations > 2** | Test passage without architectural discipline is a partial result, not a gate pass. |
 | **Condition B run without a verifiable Condition A baseline** | The claim is comparative. Condition B results alone cannot confirm uplift. |
 | **Human grading of diffs not saved** | Grading that cannot be reproduced by a second reviewer does not meet the reproducibility standard. |
-| **Forbidden paths touched** | Any changes under `book/`, `examples/taskflow/src/`, `examples/taskflow/tests/`, `mcp/`, `claude/`, `.github/`, or `governance/` during an eval run invalidate that run. |
+| **Apparatus paths touched** | Any changes to the *immutable apparatus* — `evals/tasks/`, `evals/graders/`, `evals/protocol.yaml`, `.claude/`, `CLAUDE.md`, `mcp/architecture-checker/checker.py`, `book/`, `.github/`, or `governance/` — during a task-trial invalidate that trial. This does **not** include `examples/taskflow/src/` or `examples/taskflow/tests/` — those are the *mutable experimental target* T1/T3/T6 are supposed to modify; forbidding changes there would make a successful trial invalidate itself. *(Correction, 2026-09-03: the original list included `examples/taskflow/src/`/`tests/`, contradicting the task definitions in §3, which require modifying exactly those paths.)* |
 | **Human gate unresolved → DELIVERED claimed** | A stage or release cannot be marked DELIVERED while a decision gate is open, regardless of automated checks. |
 
 ---
