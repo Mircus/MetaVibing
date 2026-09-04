@@ -7,18 +7,34 @@
 # source of *why* each of these choices was made; this file is the
 # machine-checkable *what*.
 #
-# NOT YET FROZEN. baseline_commit_sha below is a placeholder — the actual
+# NOT YET FROZEN. target_baseline_sha below is a placeholder — the actual
 # freeze action is: commit this file (and everything else under
 # evals/, .claude/, CLAUDE.md, mcp/architecture-checker/), note that
 # commit's SHA, fill it in here, tag `eval-protocol-v1-pilot-freeze`,
 # and only then start the dry-run trial. Filling in a real SHA before
 # that commit exists would be a fabricated value, not a frozen one.
+#
+# Two separate identities, not one self-referential SHA (correction,
+# 2026-09-04 — a commit cannot contain its own hash, so a single
+# "baseline_commit_sha" field describing both "what state is this
+# protocol frozen at" and "what commit do trial worktrees come from"
+# was an unresolvable puzzle):
+#   - apparatus_freeze_ref: the git TAG marking the immutable apparatus
+#     (this file, evals/, .claude/, CLAUDE.md, the checker) — a name,
+#     not a SHA, so it has no self-reference problem.
+#   - target_baseline_sha: the actual commit SHA every trial worktree
+#     is created FROM. In practice this is the freeze commit itself
+#     (tagged by apparatus_freeze_ref) once it exists — two names for
+#     one commit, kept as two fields because they answer different
+#     questions ("is the apparatus still what I froze" vs. "what do I
+#     `git worktree add` from").
 
 protocol_version: v1-pilot
 charter_path: evals/baseline/README.md
 charter_reference_map: see charter's own "Reference Map" section
 
-baseline_commit_sha: "TBD — set at the eval-protocol-v1-pilot-freeze tag, not before"
+apparatus_freeze_ref: "TBD — set to the tag name `eval-protocol-v1-pilot-freeze` once created"
+target_baseline_sha: "TBD — set to that tag's commit SHA, not before"
 
 # ── Apparatus identity — what "frozen" means, checked by hash ─────────────
 # Any of these hashes changing after the freeze tag invalidates every
@@ -28,12 +44,12 @@ baseline_commit_sha: "TBD — set at the eval-protocol-v1-pilot-freeze tag, not 
 apparatus_hashes:
   sha256_algorithm: sha256 of raw file bytes, no normalization
   files:
-    evals/tasks/T1.md: 2b39ec37091816256171712a643025a080c63202865f6e033d9729ad4a8d4d64
-    evals/tasks/T3.md: cf7425e48e33c29b38a3d7d864ff2f266b82e3f742d223438cbe98f16cc460ca
+    evals/tasks/T1.md: 106efb16899f53f911de4cae537e6d9cfc77c02699f597f85d3d22839e9b35f5
+    evals/tasks/T3.md: 06e982f3d3390ace29aaf883ca08b54c5a1f61800b43b4f657aa585496818e19
     evals/tasks/T6.md: 2d61568782f774888bded685254ee618451652a37d96a0abf2d3c1f36a5ce71c
     evals/tasks/fixtures/T3_pre_existing_taskflow.db: 2f1034a0edf4ba1a65cfd3a0066153098ad82e67dad5a79bd6813d4d00caf461
-    evals/graders/rubric.md: 60661ef4f81c00bacbefa7b185c29c0f01c420cf08bb6f878356af3809b0a5e4
-    evals/acceptance/test_T1.py: edd1faeed77c475cd6603f35d75fab272a34ff594929944a1c29432eef499543
+    evals/graders/rubric.md: 0ee5592252846f4bd6b9896af0f4e696a39bc1eff3193c93de11a10a78b1e611
+    evals/acceptance/test_T1.py: 9f841885d7eae240feb6ca77380ad2d0ca3f24915e8d59d148c9a13d6c08dcb2
     evals/acceptance/test_T3.py: 12ac11bb7bf5c9c0b5c1f9db1b08a4b0c079fb372b5ce44144bd71d45689bb07
     evals/acceptance/test_T6.py: a1dd453339d3f54658c11b50749df541fd71484d614cdbdc3e0050ad85d2db91
     mcp/architecture-checker/checker.py: 4c4e853d0b27e4adccf6af13e7c839307ca8556cb19b25efe7cee1ad5508449e
@@ -92,8 +108,30 @@ trial_order:
 # ── Per-trial procedure ─────────────────────────────────────────────────
 
 worktree_reset:
-  procedure: "fresh disposable git worktree (or clone) created from baseline_commit_sha for every trial, destroyed after; charter §5.1"
+  procedure: "fresh disposable git worktree (or clone) created from target_baseline_sha for every trial, destroyed after; charter §5.1"
   never: "reuse a worktree across trials, or trust 'fresh Claude Code session' alone as isolation"
+
+# ── Evaluator/agent filesystem separation ───────────────────────────────
+# CRITICAL, not optional (correction, 2026-09-04): evals/acceptance/ lives
+# in the same repository Claude Code can read. "We don't hand Claude the
+# acceptance tests" is not enforced by anything if the trial's workspace
+# is just this repo checked out — Claude can `grep evals/acceptance/` and
+# read the exam. The runner MUST construct two physically separate
+# filesystem trees per trial, not just avoid mentioning the tests:
+
+acceptance_test_isolation:
+  evaluator_checkout:
+    contains: [evals/acceptance/, evals/graders/, evals/tasks/fixtures/ (master copy), evals/protocol.yaml]
+    visible_to_agent: false
+    purpose: "the runner reads/copies from here; the trial subject never gets a path into this tree"
+  agent_visible_trial_repo:
+    contains:
+      - "examples/taskflow/ (the actual target)"
+      - "CLAUDE.md, .claude/  — Condition B only, absent entirely in Condition A"
+      - "evals/tasks/fixtures/T3_pre_existing_taskflow.db — T3 only, copied in because the T3 prompt itself explicitly tells Claude it will receive this file; this is the one fixture that is SUPPOSED to be agent-visible"
+    visible_to_agent: true
+    excludes_explicitly: ["evals/acceptance/", "evals/graders/", "evals/protocol.yaml", "the rest of evals/"]
+  enforcement: "the runner constructs agent_visible_trial_repo as its own directory (or worktree with evals/ sparse-excluded) — never just 'the same checkout, please don't look over there'"
 
 first_submission_definition: "charter §5.4 — the filesystem state at Claude's first terminal completion response to the initial prompt; all self-directed iteration before that point is part of the same first attempt"
 
@@ -108,7 +146,8 @@ exclusion_retry_policy: "charter §5.7 — API error or interrupted session: re-
 
 metrics:
   M1:
-    formula: "checker_violations(A1) + checker_violations(R1) + human_count(A2) + human_count(A3) + human_count(S1) + human_count(S2) + human_count(D1), per evals/graders/rubric.md, summed across all 9 Condition B task-trials"
+    formula: "delta_checker_violations(A1) + delta_checker_violations(R1) + human_count(A2) + human_count(A3) + human_count(S1) + human_count(S2) + human_count(D1), per evals/graders/rubric.md, summed across all 9 Condition B task-trials"
+    delta_definition: "checker violations present in the trial's output but absent from mcp/architecture-checker/check_logs/taskflow_baseline.json, matched by (rule, file, snippet) fingerprint — NOT the checker's raw/absolute output. TaskFlow starts with ~20 baseline violations by design; using the raw count against a <=2 threshold would fail every trial, including an untouched one, before it even started."
     threshold: "<= 2, combined across T1+T3+T6, all Condition B trials"
   M2:
     formula: "mean(correction_turns) across the 3 trials of a task, per condition — correction_turn_definition above"
@@ -124,8 +163,8 @@ checker_baseline_reference: "mcp/architecture-checker/check_logs/taskflow_baseli
 # ── Explicitly not yet done ─────────────────────────────────────────────
 
 not_yet_built:
-  - "the trial runner itself (mechanical: worktree, launch, snapshot, grade-packet, teardown — no experimental judgment)"
+  - "the trial runner itself (mechanical: worktree, launch, snapshot, grade-packet, teardown — no experimental judgment), including enforcing acceptance_test_isolation as two real separate filesystem trees, not a convention"
   - "the grader packet generator"
   - "CI wiring this apparatus into automated checks"
   - "the throwaway PILOT-INFRA-DRYRUN trial that must pass through the whole machinery before any of the real 18 count"
-  - "the freeze tag itself — baseline_commit_sha above is the marker that it hasn't happened yet"
+  - "the freeze tag itself — target_baseline_sha/apparatus_freeze_ref above are the markers that it hasn't happened yet"

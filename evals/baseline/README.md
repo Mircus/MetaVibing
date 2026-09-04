@@ -199,7 +199,7 @@ Before any PR is merged:
 
 Before MetaVibing v1 is announced publicly:
 - [ ] **The full 18-trial Condition A vs. Condition B comparison is run and published** in `evals/results/`, including A→B deltas for M1, M2, and M3 — see "Comparative evidence" below. This was previously listed as a v1.1 stretch gate; that was backwards, since the core claim (§1) is explicitly comparative and Condition B results alone cannot confirm it (§7).
-- [ ] **T1, T3, T6 each meet M3 (≥8/9 first-submission pytest passes) under Condition B** — not merely "pass on the mean/median trial." A task passing 6/9 with 3 failures hidden inside an average does not meet the gate.
+- [ ] **Pooled Condition B M3 across T1+T3+T6 is ≥8/9** *(corrected 2026-09-04 — M3 is defined in §4 as pooled across all 9 Condition B task-trials, not 8/9 per individual task, which only has 3 trials each; the previous wording here contradicted the metric's own definition)* — not merely "pass on the mean/median trial." A pooled 6/9 with 3 failures hidden inside an average does not meet the gate.
 - [ ] **Condition B produces ≤ 2 architectural violations total** across T1 + T3 + T6 (combined across all trials).
 - [ ] Grader rubric (`evals/graders/rubric.md`) is documented and grading was blinded per §5.5.
 - [ ] `book/metavibing-manual.md` is human-reviewed and copyedited — not just mechanically extracted.

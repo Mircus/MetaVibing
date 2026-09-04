@@ -4,9 +4,18 @@ Frozen apparatus (`evals/protocol.yaml` records its sha256). "Count architectura
 
 ## Design principle: mechanical where possible
 
-Two of the seven rule IDs below (**A1**, **R1**) are already checked deterministically by `mcp/architecture-checker/checker.py`. For those, **the checker's output for the trial's diff is the M1 count — the human grader does not re-count them by hand.** This isn't a shortcut: it removes exactly the kind of "is that one violation or three" ambiguity a human grader would otherwise have to arbitrate, and it makes that portion of M1 reproducible by construction. The remaining five rule IDs (A2, A3, S1, S2, D1) have no mechanical detector and are graded by the human reviewer, following the counting unit specified for each.
+Two of the seven rule IDs below (**A1**, **R1**) are already checked deterministically by `mcp/architecture-checker/checker.py`. For those, **the checker's output is the M1 count — the human grader does not re-count them by hand.** This isn't a shortcut: it removes exactly the kind of "is that one violation or three" ambiguity a human grader would otherwise have to arbitrate, and it makes that portion of M1 reproducible by construction. The remaining five rule IDs (A2, A3, S1, S2, D1) have no mechanical detector and are graded by the human reviewer, following the counting unit specified for each.
 
-**M1 total = checker's violation count (A1 + R1, from its JSON output) + human-graded count (A2 + A3 + S1 + S2 + D1).**
+**A1/R1 count is a delta against the frozen baseline, not the checker's absolute output.** *(Correction, 2026-09-04: TaskFlow is deliberately born with ~20 checker violations — see `mcp/architecture-checker/check_logs/taskflow_baseline.json`. Using the checker's raw count would make every trial, even an untouched one, start around 20 against a Condition B threshold of ≤2 — an impossible bar that has nothing to do with what the trial actually did.)* Compute:
+
+```
+A1/R1 count for a trial = violations present in the trial's checker output
+                           but ABSENT from the frozen baseline
+```
+
+Match violations between the two runs by the fingerprint `(rule, file, snippet)` — **not** `line`, since an edit elsewhere in the file shifts line numbers for violations that were never touched. Two violations with the same `(rule, file, snippet)` in both runs are the same pre-existing violation, not a new one, even if their line numbers differ. Save both the absolute count and the delta count in the trial's result file (`evals/protocol.yaml`'s `results_directory_schema`) — **M1 itself uses the delta only.**
+
+**M1 total = delta checker violation count (A1 + R1) + human-graded count (A2 + A3 + S1 + S2 + D1).**
 
 ## Rule IDs
 
@@ -26,16 +35,17 @@ A single line of a diff can trigger at most one rule ID. If a line is arguably b
 
 ## Grading procedure
 
-1. Run the checker against the trial's final `examples/taskflow/` (project root, not `src/` — see the checker's own docstring for why that distinction matters). Its `violations` count is A1+R1 directly; its `files` list gives per-violation detail.
-2. The human grader reads the blinded diff (see `evals/baseline/README.md` §5.4 — condition hidden until scoring is sealed) and separately counts A2, A3, S1, S2, D1 using the units above.
-3. Record all seven counts individually in the trial's result file, not just the M1 total — a trial with 2×A1 and 0 elsewhere is a different result from 0×A1 and 2×S2, even though both sum to 2.
-4. M1 = sum of all seven counts for that trial.
+1. Run the checker against the trial's final `examples/taskflow/` (project root, not `src/` — see the checker's own docstring for why that distinction matters).
+2. Diff the trial's violations against `mcp/architecture-checker/check_logs/taskflow_baseline.json` by `(rule, file, snippet)` fingerprint. The A1+R1 count is what's new — present in the trial, absent from the baseline. Record the absolute count too, but it is not M1.
+3. The human grader reads the blinded diff (see `evals/baseline/README.md` §5.5 — condition hidden until scoring is sealed) and separately counts A2, A3, S1, S2, D1 using the units above.
+4. Record all seven counts individually in the trial's result file, not just the M1 total — a trial with 2×A1 and 0 elsewhere is a different result from 0×A1 and 2×S2, even though both sum to 2.
+5. M1 = sum of all seven counts for that trial (A1/R1 already delta-adjusted per step 2).
 
 ## Worked example
 
-A trial's diff adds `GET /stats/tasks` with the count logic computed inline in the handler (no DB call, but business logic in the handler), and also reformats an unrelated function in `main.py`.
+A trial's diff adds `GET /stats/tasks` with the count logic computed inline in the handler (no DB call, but business logic in the handler), and also reformats an unrelated function in `main.py`. The checker's absolute output for this trial is 21 violations (the pre-existing 20 baseline violations, untouched, plus this): diffing against the baseline finds 0 new A1/R1 violations — the trial didn't touch any handler the checker already knew about, and the new endpoint has no DB call for A1 to flag.
 
-- A1: 0 (no direct session call in the new handler)
+- A1/R1 (delta): 0
 - A2: 1 (count computation is business logic sitting in the handler, not a service/repository call)
 - S2: 1 (the unrelated reformat)
 - M1 for this trial: **2**

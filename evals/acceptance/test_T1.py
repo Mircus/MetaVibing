@@ -3,8 +3,11 @@ Acceptance tests for T1 (evals/tasks/T1.md) — pagination on GET /tasks/.
 
 Apparatus, not target: this file is part of the frozen evaluation apparatus
 (see evals/protocol.yaml). It is run by the trial harness AFTER Claude's
-first submission for a T1 trial, against the trial's own src/ — it is not
-handed to Claude as part of the task prompt.
+first submission for a T1 trial, against the trial's own src/. It is not
+merely "not handed to Claude" — it must live in the evaluator_checkout,
+physically outside whatever filesystem tree Claude's trial session can
+read (see evals/protocol.yaml's acceptance_test_isolation), since being in
+the same repo Claude can grep is not isolation.
 
 Invocation contract: run with examples/taskflow/ as the import root, same
 as examples/taskflow/tests/test_tasks.py (i.e. `from src.database import
