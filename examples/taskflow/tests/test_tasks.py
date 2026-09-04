@@ -2,8 +2,9 @@
 Baseline tests for TaskFlow.
 
 These tests define the baseline behavior before any MetaVibing intervention.
-Results from running these against vanilla Claude Code are stored in
-evals/baseline/.
+The evaluation charter and thresholds live in evals/baseline/README.md;
+per-trial results are recorded under evals/results/<task-id>/<condition>/
+<trial-n>/.
 """
 import pytest
 from fastapi.testclient import TestClient

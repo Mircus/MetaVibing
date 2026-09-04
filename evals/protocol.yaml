@@ -1,0 +1,131 @@
+# MetaVibing baseline evaluation — machine-readable frozen protocol.
+#
+# This turns the prose in evals/baseline/README.md into an executable
+# contract: everything a trial runner needs to behave deterministically,
+# and everything a skeptical third party needs to audit that it did.
+# The charter (evals/baseline/README.md) is still the human-readable
+# source of *why* each of these choices was made; this file is the
+# machine-checkable *what*.
+#
+# NOT YET FROZEN. baseline_commit_sha below is a placeholder — the actual
+# freeze action is: commit this file (and everything else under
+# evals/, .claude/, CLAUDE.md, mcp/architecture-checker/), note that
+# commit's SHA, fill it in here, tag `eval-protocol-v1-pilot-freeze`,
+# and only then start the dry-run trial. Filling in a real SHA before
+# that commit exists would be a fabricated value, not a frozen one.
+
+protocol_version: v1-pilot
+charter_path: evals/baseline/README.md
+charter_reference_map: see charter's own "Reference Map" section
+
+baseline_commit_sha: "TBD — set at the eval-protocol-v1-pilot-freeze tag, not before"
+
+# ── Apparatus identity — what "frozen" means, checked by hash ─────────────
+# Any of these hashes changing after the freeze tag invalidates every
+# trial run since, per the charter's own apparatus/target distinction
+# (evals/baseline/README.md §7, "Apparatus paths touched").
+
+apparatus_hashes:
+  sha256_algorithm: sha256 of raw file bytes, no normalization
+  files:
+    evals/tasks/T1.md: 2b39ec37091816256171712a643025a080c63202865f6e033d9729ad4a8d4d64
+    evals/tasks/T3.md: cf7425e48e33c29b38a3d7d864ff2f266b82e3f742d223438cbe98f16cc460ca
+    evals/tasks/T6.md: 2d61568782f774888bded685254ee618451652a37d96a0abf2d3c1f36a5ce71c
+    evals/tasks/fixtures/T3_pre_existing_taskflow.db: 2f1034a0edf4ba1a65cfd3a0066153098ad82e67dad5a79bd6813d4d00caf461
+    evals/graders/rubric.md: 60661ef4f81c00bacbefa7b185c29c0f01c420cf08bb6f878356af3809b0a5e4
+    evals/acceptance/test_T1.py: edd1faeed77c475cd6603f35d75fab272a34ff594929944a1c29432eef499543
+    evals/acceptance/test_T3.py: 12ac11bb7bf5c9c0b5c1f9db1b08a4b0c079fb372b5ce44144bd71d45689bb07
+    evals/acceptance/test_T6.py: a1dd453339d3f54658c11b50749df541fd71484d614cdbdc3e0050ad85d2db91
+    mcp/architecture-checker/checker.py: 4c4e853d0b27e4adccf6af13e7c839307ca8556cb19b25efe7cee1ad5508449e
+    mcp/architecture-checker/check_logs/taskflow_baseline.json: b2a44b1b7ed445daa2e1294b32a15da8374b9818b79b4164aa0534daa69ce819
+  # Everything under .claude/ and CLAUDE.md is also frozen apparatus, but
+  # is hashed as a directory tree at freeze time (git tree hash of the
+  # tag), not enumerated file-by-file here — see the freeze tag itself.
+
+# ── Environment ─────────────────────────────────────────────────────────
+
+environment:
+  os: "Linux or macOS (Windows untracked, per charter §5.1)"
+  python_version: "record actual `python --version` output per trial"
+  dependency_pin_source: examples/taskflow/requirements.txt
+  dependency_freeze_procedure: "pip install -r requirements.txt, then `pip freeze` recorded verbatim per trial — do not trust the pin alone"
+  claude_code_version: "record actual version per trial — not pinned here, since it may drift between the pilot and any later replication; record what actually ran"
+  model_id: "record actual model id per trial (charter §5.1: current production model at time of run)"
+
+# ── Conditions ───────────────────────────────────────────────────────────
+# Full definitions: charter §5.2. Summarized here for the runner's use.
+
+conditions:
+  A:
+    claude_md: absent
+    rules_active: false
+    skills_active: false
+    agents_active: false
+    initial_prompt: "the frozen task text verbatim, no wrapper"
+  B:
+    claude_md: repo's committed CLAUDE.md
+    rules_active: true  # .claude/rules/, loaded natively
+    skills_active: ["ship-change"]
+    agents_active: ["final-reviewer"]
+    initial_prompt: "/ship-change <frozen task text verbatim>"  # charter §5.2 — standardized, not left to whether a trial happens to reach for the Skill
+
+# ── Trial order — generated once, frozen, never regenerated ───────────────
+# Algorithm: Python's `random.Random(seed)`, one `.shuffle()` call per
+# task in the order T1, T3, T6, each call shuffling a fresh
+# ['A','A','A','B','B','B'] list (3 trials per condition per task).
+# Reproducible by anyone: `random.Random(20260904)` then three
+# sequential `.shuffle()` calls on that exact list, in that exact order,
+# reproduces the exact sequences below.
+
+rng:
+  algorithm: "python stdlib random.Random(seed).shuffle()"
+  seed: 20260904
+
+trial_order:
+  T1: [A, B, B, B, A, A]
+  T3: [A, B, A, B, B, A]
+  T6: [A, A, B, B, A, B]
+  # Reading order per task: trial 1 through trial 6 in list order. 3 of
+  # each letter per task by construction (not re-verified per shuffle —
+  # shuffle preserves multiset, this is a property of the input list).
+
+# ── Per-trial procedure ─────────────────────────────────────────────────
+
+worktree_reset:
+  procedure: "fresh disposable git worktree (or clone) created from baseline_commit_sha for every trial, destroyed after; charter §5.1"
+  never: "reuse a worktree across trials, or trust 'fresh Claude Code session' alone as isolation"
+
+first_submission_definition: "charter §5.4 — the filesystem state at Claude's first terminal completion response to the initial prompt; all self-directed iteration before that point is part of the same first attempt"
+
+correction_turn_definition: "charter §5.4 — one human follow-up message intended to repair an unsatisfactory result; a clarifying question is not a correction turn"
+
+grader_blinding_procedure: "charter §5.5 — diff presented as `Trial <n> / Task <id> / Condition: hidden`; condition revealed only after rubric counts are sealed"
+
+exclusion_retry_policy: "charter §5.7 — API error or interrupted session: re-run once, record as failure if the re-run also fails (not excluded); out-of-condition context leak: discard and re-run; never exclude a trial merely because the result is bad"
+
+# ── Metrics — formulas and thresholds ──────────────────────────────────
+# Full definitions: charter §4. Restated here as literal formulas.
+
+metrics:
+  M1:
+    formula: "checker_violations(A1) + checker_violations(R1) + human_count(A2) + human_count(A3) + human_count(S1) + human_count(S2) + human_count(D1), per evals/graders/rubric.md, summed across all 9 Condition B task-trials"
+    threshold: "<= 2, combined across T1+T3+T6, all Condition B trials"
+  M2:
+    formula: "mean(correction_turns) across the 3 trials of a task, per condition — correction_turn_definition above"
+    threshold: "Condition B mean <= 1.5 per task"
+  M3:
+    formula: "count(trials where acceptance tests + baseline pytest all pass at first_submission) / 9, per task's 3 Condition B trials pooled with the other two tasks' Condition B trials — i.e. out of the 9 total Condition B task-trials"
+    threshold: ">= 8 / 9"
+
+results_directory_schema: "evals/results/<task-id>/<condition>/<trial-n>/ containing: prompt.txt (exact text sent), transcript_or_diff, pytest_output.txt, checker_output.json, correction_turns.json (message log the M2 count was computed from), grader_packet/ (blinded, per grader_blinding_procedure), sealed_score.json (rubric counts + M1/M2/M3 for that trial), condition_reveal.json (written only after sealed_score.json exists)"
+
+checker_baseline_reference: "mcp/architecture-checker/check_logs/taskflow_baseline.json — PR/regression gate compares against this, not zero (charter §6, PR-level gates)"
+
+# ── Explicitly not yet done ─────────────────────────────────────────────
+
+not_yet_built:
+  - "the trial runner itself (mechanical: worktree, launch, snapshot, grade-packet, teardown — no experimental judgment)"
+  - "the grader packet generator"
+  - "CI wiring this apparatus into automated checks"
+  - "the throwaway PILOT-INFRA-DRYRUN trial that must pass through the whole machinery before any of the real 18 count"
+  - "the freeze tag itself — baseline_commit_sha above is the marker that it hasn't happened yet"

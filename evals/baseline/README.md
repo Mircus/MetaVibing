@@ -121,13 +121,14 @@ Three metrics are collected per condition, per task (D4):
 - `CLAUDE.md` is empty or absent.
 - No Rules, Skills, Agents, or Hooks active.
 - Claude operates with default behaviour only.
+- Claude is given the frozen task text (`evals/tasks/T*.md`) directly, as the initial prompt — no skill invocation.
 
 **Condition B — MetaVibing active:**
 - `CLAUDE.md` populated from the manual's template (full architectural constraints active — see [`CLAUDE.md`](../../CLAUDE.md) for the current canonical version).
 - All path-scoped Rules active (sourced from `.claude/rules/`, loaded natively by Claude Code).
-- At least one Skill active: `/ship-change` (`.claude/skills/ship-change/`).
-- The `final-reviewer` subagent (`.claude/agents/final-reviewer.md`) available for specialist review.
+- The `/ship-change` Skill and `final-reviewer` subagent (`.claude/skills/ship-change/`, `.claude/agents/final-reviewer.md`) available.
 - Architecture-checker active as standalone CLI grader: `python mcp/architecture-checker/checker.py examples/taskflow` (project root, not `src/` — see the checker's own docstring; D6 — relabelled as standalone CLI for v1; MCP server upgrade is a v1.1 item).
+- **The initial prompt is standardized, not left to chance:** Claude is given `/ship-change <verbatim frozen task text>`, not the bare task text. "The Skill is available" does not guarantee any given trial actually invokes it — some B trials might and some might not, which would silently turn Condition B into two different conditions. Standardizing the invocation makes the intervention itself the fixed variable between A and B, not "whichever trials happened to reach for the Skill."
 
 ### 5.3 Trial Design
 
@@ -142,25 +143,31 @@ Three metrics are collected per condition, per task (D4):
   | T3 | B, A, A, B, B, A |
   | T6 | A, B, A, B, A, B |
 
-  This exact table is a placeholder shape illustrating the principle (precommitted, counterbalanced, not experimenter-chosen mid-run) — before the first real trial, regenerate the per-task order with a real RNG, record the seed in `evals/protocol.yaml`, and do not deviate from it once trials begin.
+  This table is now superseded — **`evals/protocol.yaml`** holds the actual generated order (seed `20260904`, `random.Random(seed).shuffle()`, one call per task in T1/T3/T6 order) and is the authoritative sequence. This table stays here only to illustrate the principle inline; if the two ever disagree, `protocol.yaml` wins.
 
-### 5.4 Grading
+### 5.4 What counts as "first submission" (governs M2 and M3)
+
+*(Added 2026-09-04 — without this, A/B trials are not comparable: nothing else defines when a trial's "first attempt" ends and a human correction begins.)*
+
+**First submission** is the filesystem state at the moment Claude first returns a terminal completion response to the human after receiving the initial frozen task text (`evals/tasks/T*.md`) — the initial invocation, nothing more. Everything before that point counts as part of the same, single first attempt, including: reading files, editing repeatedly, running `pytest` itself, invoking `final-reviewer`, noticing and fixing its own failures, and any other self-directed iteration. Snapshot the diff and run the acceptance tests / checker / baseline pytest independently at that point — do not let Claude's own self-report of success substitute for it.
+
+A human sending any further message intended to repair an unsatisfactory result — starting with the literal text `fix this` or equivalent — begins **correction turn 1**, and each subsequent such message begins the next correction turn. A message that only asks a clarifying question, without asking for a repair, does not count as a correction turn.
+
+### 5.5 Grading
 
 **Automated (M3):**
 ```bash
 cd examples/taskflow
 pytest
 ```
-Record full output verbatim in `evals/results/`. Pass = all baseline tests green. Fail = any red.
+Record full output verbatim in `evals/results/`, snapshotted at first submission (§5.4). Pass = all baseline tests green plus the task's acceptance tests (`evals/acceptance/test_<task-id>.py`) green. Fail = any red.
 
-**Human grading (M1 and M2):**
-- Reviewer reads the diff produced by Claude for each trial.
-- Scores each diff against the explicit constraints in `CLAUDE.md`: one violation count per constraint violated.
-- Records correction turn count (number of follow-up prompts sent before pytest passes or the trial is abandoned).
-- Grading rubric: see `evals/graders/rubric.md` (to be produced in a subsequent charter stage).
-- **Grading is blinded where possible.** The diff is presented to the grader as `Trial <n> / Task <id> / Condition: hidden`, without CLAUDE.md/Rules visible in the diff itself and without the grader having run the trial. Condition is revealed only after the violation count and correction-turn count are recorded, to keep expectation bias out of the primary metric.
+**Automated (M2):** correction turns are counted from the trial transcript/run log per the §5.4 definition — mechanically, from the record of human messages sent, not judged by a human reading the code diff. This removes M2 from human grading entirely; a grader disagreeing with the code is not the same event as a human having to ask for a fix.
 
-### 5.5 Reproducibility Standard
+**Human grading (M1 only):** M1 is graded per `evals/graders/rubric.md` — atomic rule IDs (A1, A2, A3, R1, S1, S2, D1), each with an exact counting unit, so "how many violations" doesn't depend on who's counting. Two of the seven rule IDs (A1, R1) are graded by the architecture-checker mechanically, not by the human reviewer, for the same reason. The human grader scores only the remaining five.
+- **Grading is blinded where possible.** The diff is presented to the grader as `Trial <n> / Task <id> / Condition: hidden`, without CLAUDE.md/Rules visible in the diff itself and without the grader having run the trial. Condition is revealed only after the rubric's counts are recorded, to keep expectation bias out of the primary metric.
+
+### 5.6 Reproducibility Standard
 
 All of the following are saved verbatim to `evals/results/<task-id>/<condition>/<trial-n>/`:
 - The exact prompt text used.
@@ -170,7 +177,7 @@ All of the following are saved verbatim to `evals/results/<task-id>/<condition>/
 
 A second experimenter must be able to reproduce the grading judgment from these artifacts alone without access to the original session.
 
-### 5.6 Exclusion and Error Handling
+### 5.7 Exclusion and Error Handling
 
 - Any trial where the LLM API returned an error or the session was interrupted: **re-run once**. If the re-run also fails, record it as a trial failure (not excluded).
 - Any trial where the practitioner accidentally provided out-of-condition context (e.g., CLAUDE.md loaded in a Condition A session): discard and re-run.
@@ -194,7 +201,7 @@ Before MetaVibing v1 is announced publicly:
 - [ ] **The full 18-trial Condition A vs. Condition B comparison is run and published** in `evals/results/`, including A→B deltas for M1, M2, and M3 — see "Comparative evidence" below. This was previously listed as a v1.1 stretch gate; that was backwards, since the core claim (§1) is explicitly comparative and Condition B results alone cannot confirm it (§7).
 - [ ] **T1, T3, T6 each meet M3 (≥8/9 first-submission pytest passes) under Condition B** — not merely "pass on the mean/median trial." A task passing 6/9 with 3 failures hidden inside an average does not meet the gate.
 - [ ] **Condition B produces ≤ 2 architectural violations total** across T1 + T3 + T6 (combined across all trials).
-- [ ] Grader rubric (`evals/graders/rubric.md`) is documented and grading was blinded per §5.4.
+- [ ] Grader rubric (`evals/graders/rubric.md`) is documented and grading was blinded per §5.5.
 - [ ] `book/metavibing-manual.md` is human-reviewed and copyedited — not just mechanically extracted.
 - [ ] All companion repo examples run end-to-end from a clean `git clone` with documented setup.
 - [ ] The architecture-checker is documented clearly as a **standalone CLI only** for v1 (MCP server wrapper is a v1.1 item — see D6).
@@ -251,6 +258,9 @@ The following outcomes do **not** satisfy the v1 release criteria, regardless of
 | TaskFlow sandbox | `examples/taskflow/README.md` |
 | Architectural constraints | `CLAUDE.md` (section: Architectural Constraints) |
 | Architecture checker CLI | `mcp/architecture-checker/checker.py` |
-| Task prompts | `evals/tasks/` |
-| Grader rubric | `evals/graders/rubric.md` (charter: subsequent stage) |
+| Task prompts (frozen) | `evals/tasks/T1.md`, `T3.md`, `T6.md` |
+| T3 pre-existing-database fixture | `evals/tasks/fixtures/T3_pre_existing_taskflow.db` |
+| Acceptance tests (apparatus, run after first submission) | `evals/acceptance/test_T1.py`, `test_T3.py`, `test_T6.py` |
+| Grader rubric | `evals/graders/rubric.md` |
+| Machine-readable frozen protocol | `evals/protocol.yaml` |
 | Trial results | `evals/results/<task-id>/<condition>/<trial-n>/` |
