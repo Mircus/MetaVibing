@@ -1,21 +1,54 @@
 # MetaVibing
 
-**Engineering Agents That Improve Their Own Working Environment**
+**Stop correcting your AI. Start evolving the environment it works in.**
 
-> *A practical field manual and companion repository for using Claude Code not merely to write software, but to improve the system through which Claude itself works.*
+Your AI makes a mistake. You correct it. Next week, it makes the same mistake again.
+
+MetaVibing turns a valuable correction into a persistent Rule, Skill, specialist Agent, or deterministic Check — so the *next* session inherits what you learned, instead of you saying it again.
+
+**[→ Try MetaVibing in 10 Minutes](docs/10-minute-metavibe.md)** · [Read the Manual](book/MetaVibing_Provisional_Booklet_v2.md) · [Evaluation Protocol](evals/baseline/README.md)
+
+> **Prompt engineering improves the current conversation. MetaVibing improves the next one.**
 
 ---
 
 ## What Is MetaVibing?
 
-Vibe coding means collaborating with an AI to create the artifact.  
-**MetaVibing** means collaborating with the AI to improve the intelligence system that creates the artifact.
+Vibe coding means collaborating with an AI to create the artifact. **MetaVibing** means collaborating with the AI to improve the intelligence system that creates the artifact — CLAUDE.md, Rules, Skills, specialist Agents, and deterministic Checks, checked into the repository alongside the code they govern.
 
-When Claude does something badly, ask:
+When Claude does something badly, the question isn't just "how do I fix this" — it's:
 
 > *What artifact would make this correction unnecessary next time?*
 
-That one question contains most of the method.
+That question is most of the method.
+
+## The Core Loop
+
+```
+AI makes a mistake
+       ↓
+You correct it
+       ↓
+Correction repeats
+       ↓
+Extract the pattern
+       ↓
+Rule / Skill / Agent / Check
+       ↓
+Future work inherits the correction
+```
+
+## Why Not Just Prompt Engineering?
+
+A better prompt makes *this* conversation go well. It doesn't survive a new session, a new task, or a teammate who never saw it. MetaVibing takes the same correction and gives it a durable, checked-in form — so it's part of the environment the next session starts from, not something anyone has to remember to repeat.
+
+**[→ Try it yourself in 10 minutes](docs/10-minute-metavibe.md)** — clone the repo, watch a real correction happen, and turn it into a Rule live.
+
+---
+
+## The Meta-Stack
+
+Different kinds of friction call for different kinds of artifact:
 
 ```
 Recurring fact or convention    →  CLAUDE.md
@@ -24,145 +57,98 @@ Repeated procedure              →  Skill
 Repeated specialist role        →  Subagent
 Hard behavioral boundary        →  Permission / Hook
 Missing external capability     →  MCP
-Reusable bundle of capabilities →  Plugin
 Uncertain improvement           →  Evaluation
-Repeated meta-maintenance       →  MetaAgent
 ```
+
+## What Exists Today
+
+- ✓ **Rules** — live, natively loaded from `.claude/rules/`
+- ✓ **Skills** — live (`/meta`, `/ship-change`)
+- ✓ **A specialist Agent** — live (`final-reviewer`), structurally read-only (`tools: Read, Grep, Glob` — enforced, not just stated)
+- ✓ **A deterministic checker** — live, standalone CLI, with its own unit tests and a real committed violation baseline
+- ✓ **TaskFlow** — a real, runnable FastAPI/SQLite specimen with a passing 8-test baseline suite
+- ✓ **A preregistered evaluation pilot** — frozen tasks, held-out acceptance tests, a grading rubric, and a machine-readable protocol, published *before* any result exists
+- ✓ **A Friction Ledger** — [`FRICTION_LEDGER.md`](FRICTION_LEDGER.md), 5 real entries from this repository's own history, including a real activation bug a behavioral test caught and this project fixed on itself
+
+## What Does Not Exist Yet
+
+- ○ **Hooks** — none implemented
+- ○ **A real MCP server** — the checker is CLI-only today; an MCP wrapper is a v1.1 item
+- ○ **Completed A/B evidence** — the 18-trial pilot is frozen and ready to run, not run
+- ○ **Ablations / held-out tasks / multi-practitioner replication** — deliberately deferred until after the first pilot
+- ○ **`experiments/`, `patterns/`, `templates/`** — described in the manual as the eventual destination, not created here yet
+
+Nothing above should be read as an empirical result. See [Evidence Status](#evidence-status).
 
 ---
 
-## Status
-
-**Implemented now:** the manual draft (Markdown), the TaskFlow sandbox app with a passing pytest suite, `CLAUDE.md` doctrine, the `.claude/` meta-stack (Rules and Skills natively loaded, an Agent with enforced read-only tools), the architecture-checker (as a standalone CLI, with unit tests and a real violation baseline), the evaluation charter (frozen protocol, not yet run), and 5 real Friction Ledger entries from this repository's own history.
-
-**Not implemented yet:** hooks, the MCP server wrapper for the architecture-checker, a fresh-clone confirmation that the `.claude/` Skills/Agent actually load in a real Claude Code session, the `experiments/`/`patterns/`/`templates/` directories described in the book, and — most importantly — the 18-trial baseline evaluation itself. The charter defines what would count as evidence; no trial has been run. Nothing in this repo should be read as an empirical result yet.
-
-This section exists so the structure below and the Quick Start links describe what is actually here, not the eventual destination.
-
----
-
-## Repository Structure
+## Repository Map
 
 ```
-claude-metavibing/
+MetaVibing/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md
-├── FRICTION_LEDGER.md            # live — 5 closed entries from this repo's own history
+├── FRICTION_LEDGER.md            # live — 5 real entries from this repo's own history
+│
+├── docs/
+│   └── 10-minute-metavibe.md     # start here
 │
 ├── book/                         # live
-│   ├── MetaVibing_Provisional_Booklet_v2.md      # current draft (Markdown only)
-│   ├── MetaVibing_Provisional_Booklet_v1.{md,docx,pdf}  # prior packaged edition
-│   ├── metavibing-manual.md      # direct conversion of the original manuscript
-│   └── The Claude MetaVibing Manual.docx         # original manuscript source
+│   └── MetaVibing_Provisional_Booklet_v2.md   # current draft (Markdown only)
 │
 ├── examples/
-│   └── taskflow/                 # live — FastAPI/SQLite sandbox
-│       ├── src/
-│       ├── tests/
-│       ├── README.md
-│       └── requirements.txt
+│   └── taskflow/                 # live — FastAPI/SQLite specimen, 8 passing tests
 │
-├── .claude/                      # meta-code artifacts — Claude Code's native config, not documentation
+├── .claude/                      # Claude Code's native config — this is what actually loads
 │   ├── rules/                    # live
 │   ├── skills/                   # live — /meta, /ship-change
 │   ├── agents/                   # partial — final-reviewer
 │   └── hooks/                    # planned — none implemented yet
 │
 ├── mcp/
-│   └── architecture-checker/     # live as a standalone CLI; MCP server wrapper planned for v1.1
+│   └── architecture-checker/     # live as a standalone CLI; MCP wrapper planned for v1.1
 │
-├── evals/
-│   └── baseline/                 # live — charter written; 18-trial run planned, not yet executed
+├── evals/                        # live — frozen pilot: tasks, acceptance tests, rubric, protocol.yaml
 │
-└── governance/                   # live — Governed HyRI v0 provenance records
+└── governance/                   # provenance records — see governance/ if you care how this repo's artifacts were produced
 ```
 
-`experiments/`, `patterns/`, and `templates/` are described in the book as the eventual destination but do not exist in this repository yet — see Status above.
+## Evidence Status
 
----
+MetaVibing's central claim — that this discipline reduces architectural drift, correction turns, and first-try failure rate compared to working without it — is **falsifiable and not yet tested.**
 
-## Quick Start
+What exists: a frozen, preregistered pilot — [`evals/baseline/README.md`](evals/baseline/README.md) (the charter: core claim, tasks, metrics, protocol) and [`evals/protocol.yaml`](evals/protocol.yaml) (the machine-readable contract: hashes, RNG-generated trial order, formulas). Three tasks, held-out acceptance tests the model never sees, a rubric with atomic rule IDs, 18 trials (3 tasks × 3 trials × 2 conditions).
 
-### 1. Read the Manual
+What doesn't exist: the trial runner, and the trials themselves. This will be reported as a **pilot** — one practitioner, non-held-out tasks — not a confirmatory study, with results published whether or not they're flattering.
 
-The current draft is [`book/MetaVibing_Provisional_Booklet_v2.md`](book/MetaVibing_Provisional_Booklet_v2.md) —
-Markdown only; a packaged `.docx`/`.pdf` release for v2 has not been built yet.
+## Manual
 
-The prior packaged edition is still available as
-[`.md`](book/MetaVibing_Provisional_Booklet_v1.md), [`.docx`](book/MetaVibing_Provisional_Booklet_v1.docx), and
-[`.pdf`](book/MetaVibing_Provisional_Booklet_v1.pdf) — superseded in content by v2, kept here for the packaged format.
-
-The unexpanded, direct conversion of the original manuscript is kept at
-[`book/metavibing-manual.md`](book/metavibing-manual.md) for reference, converted from
-[`book/The Claude MetaVibing Manual.docx`](<book/The Claude MetaVibing Manual.docx>).
-
-**The examples in the booklet are runnable, not illustrative** — `examples/taskflow/` is a real
-FastAPI app you can start, test, and scan with the architecture checker yourself (below).
-
-### 2. Run the Sandbox Project
-
-```bash
-cd examples/taskflow
-pip install -r requirements.txt
-uvicorn src.main:app --reload
-```
-
-Run tests:
-
-```bash
-cd examples/taskflow
-pytest
-```
-
-### 3. Explore the Meta-Stack
-
-- **CLAUDE.md** — persistent project doctrine for Claude · live
-- **.claude/rules/** — path-scoped contextual rules · live
-- **.claude/skills/** — reusable procedural Skills · live
-- **.claude/agents/** — specialist subagent definitions · partial
-- **.claude/hooks/** — deterministic behavioral guardrails · planned, none implemented yet
-
-### 4. Track Friction
-
-Every recurring Claude failure gets logged in [`FRICTION_LEDGER.md`](FRICTION_LEDGER.md).
-
----
-
-## The Book
-
-*MetaVibing: Engineering Agents That Improve Their Own Working Environment*
-
-**16 parts, 50+ sections:**
+*MetaVibing: Engineering Agents That Improve Their Own Working Environment* — [`book/MetaVibing_Provisional_Booklet_v2.md`](book/MetaVibing_Provisional_Booklet_v2.md), 16 parts:
 
 | Part | Topic |
 |------|-------|
 | I | What MetaVibing Actually Is |
-| II | The Claude Meta-Stack (7 layers) |
+| II | The Claude Meta-Stack |
 | III | Bootstrapping a MetaVibing Repository |
 | IV | The Daily MetaVibing Loop |
 | V | Advanced MetaVibing Patterns |
-| VI | Agent Teams and the MetaAgents Era |
-| VII | The MetaAgent |
-| VIII | Recommended Repository Architecture |
+| VI–VII | Agent Teams and the MetaAgent |
+| VIII | A Recommended Repository Architecture |
 | IX | Diagnostic Commands |
 | X | Failure Modes of MetaVibing |
 | XI | The MetaVibing Maturity Model |
-| XII | The Complete MetaVibing Session |
-| XIII | The MetaVibing Starter Kit |
+| XII–XIII | A Complete Session, and the Starter Kit |
 | XIV | The Central Discipline |
-| XV | Worked Example: The Bridle Pattern |
-| XVI | MetaVibing as a Proof Specimen |
+| XV–XVI | Worked Examples, and MetaVibing as a Proof Specimen |
 
----
+The prior packaged edition (v1, `.md`/`.docx`/`.pdf`) and the original unexpanded manuscript are kept in `book/` for reference — superseded in content by v2.
 
-## The Three-Strikes Rule
+**The Three-Strikes Rule**, from Part XIV: never suffer the same Claude failure three times. First occurrence — correct it. Second — diagnose it. Third — externalize it into a Rule, Skill, Agent, or Check.
 
-> **Never suffer the same Claude failure three times.**
+## Roadmap
 
-- First occurrence — correct it
-- Second occurrence — diagnose it  
-- Third occurrence — externalize it (create a persistent artifact)
+Run the frozen pilot → publish the results, including if they're not flattering → then hooks, a real MCP server, and ablations, each built because the evidence calls for it, not to fill out the diagram.
 
 ---
 
