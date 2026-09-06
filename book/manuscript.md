@@ -1,14 +1,79 @@
-# The Claude MetaVibing Manual — Provisional Booklet v2
+# MetaVibing
 
-*From Vibe Coding to the MetaAgents Era*
+### A Field Manual for Evolving Your AI Collaborator
 
-A practical field manual for using Claude Code not merely to write software, but to improve the system through which Claude itself works.
-
-Edition 2.0 — August 2026 — **Provisional**
+*MetaVibing — Provisional Research Preview — September 2026*
 
 ---
 
-## About This Provisional Edition
+## The Idea, in One Page
+
+Your AI collaborator makes a mistake. You correct it. Next week, in a new session, the correction is gone — it lived in your prompt, and prompts don't survive the conversation that produced them.
+
+**Prompt engineering improves the current conversation. MetaVibing improves the next one.**
+
+The method: when a correction proves valuable enough that you'd give it a second or third time, stop repeating it and give it a durable, checked-into-the-repository form instead —
+
+- a fact `CLAUDE.md` should hold,
+- a constraint scoped to the files where it actually applies,
+- a procedure worth performing the same way every time,
+- a role worth delegating to a specialist who didn't write the code,
+- an invariant worth checking mechanically instead of asking a model to remember it.
+
+That's the whole idea. Everything from here is *how* — in enough concrete detail to actually do it, and an honest account of what's proven so far and what isn't.
+
+## The Core Loop
+
+```
+AI makes a mistake
+       ↓
+You correct it
+       ↓
+Correction repeats
+       ↓
+Extract the pattern
+       ↓
+Rule / Skill / Agent / Check
+       ↓
+Future work inherits the correction
+```
+
+## The Meta-Stack
+
+Different kinds of friction call for different kinds of artifact:
+
+```
+Recurring fact or convention    →  CLAUDE.md
+Context-specific convention     →  .claude/rules/
+Repeated procedure              →  Skill
+Repeated specialist role        →  Subagent
+Hard behavioral boundary        →  Permission / Hook
+Missing external capability     →  MCP
+Uncertain improvement           →  Evaluation
+```
+
+## A Five-Minute Example
+
+TaskFlow — the companion repository's sandbox app — has a route handler that talks to the database directly:
+
+```python
+@app.post("/tasks/", response_model=Task, status_code=201)
+def create_task(task: Task, session: Session = Depends(get_session)):
+    session.add(task)
+    session.commit()
+    session.refresh(task)
+    return task
+```
+
+It works. It's also a pattern a growing project wouldn't want repeated: harder to test in isolation, harder to change persistence later. The ordinary fix is to ask Claude for a new feature, notice it repeats the same pattern, and say: *"Don't put database access in the route handler — keep that in the repository layer."* That correction normally dies with the conversation.
+
+Instead, look at what's already checked into this repository: `.claude/rules/taskflow.md`, scoped to `examples/taskflow/**/*`, states exactly that constraint. Because it's a native Claude Code Rule — not a comment, not a wiki page — it loads automatically the moment Claude works with a matching file. Ask for a new feature now (`/ship-change <task>`), and the Rule shapes the work without you restating anything.
+
+One rung further: once a constraint can be checked mechanically, stop asking a model whether it was obeyed. `python mcp/architecture-checker/checker.py examples/taskflow` walks the actual code and reports every violation of this exact rule — judgment converted into infrastructure.
+
+This is the entire method, once. The full hands-on version — including the failure case, and what to do when the Rule *doesn't* hold — is [`docs/10-minute-metavibe.md`](../docs/10-minute-metavibe.md) in the companion repository.
+
+## Status & Evidence
 
 This document is a provisional artifact under active validation. It is not a finished, copyedited release. It is produced under Governed HyRI v0 — a governed workflow discipline that uses AI agents as bounded workers under explicit context, artifact, validator, and human-gate controls. The production of this booklet is itself a specimen of that discipline. Readers should understand the following before proceeding.
 
@@ -57,7 +122,7 @@ Readers must understand what this provisional booklet does **not** claim:
 
 **A prior readiness audit of the companion repository returned NO-GO.** The companion repository was reviewed under a structured audit protocol prior to this writing. That audit returned a NO-GO verdict. That verdict has not been superseded. It has been narrowly offset only by the single governed_execution proof above (8 tests passing, exit_code=0). The two coexist: one passing test run does not constitute blanket verification or readiness. Any reader working from this companion repo should consult the most recent readiness audit before treating it as a finished reference implementation.
 
-**This booklet has not been human-reviewed and copyedited for the v1 gate.** Section 6 of the evaluation charter lists as a v1 release requirement: "`book/metavibing-manual.md` is human-reviewed and copyedited — not just mechanically extracted." That gate is pending. This document is a machine-produced provisional draft.
+**This booklet has not been human-reviewed and copyedited for the v1 gate.** Section 6 of the evaluation charter lists as a v1 release requirement: "`book/manuscript.md` is human-reviewed and copyedited — not just mechanically extracted." That gate is pending. This document is a machine-produced provisional draft.
 
 **MetaVibing itself is a proof specimen for Governed HyRI v0, not the primary intellectual output.** Per resolved decision gate dec-e84f9216: this repository exists to prove that Governed HyRI can produce real, governed artifacts — not to make MetaVibing itself a finished product. Every deliverable in this repository exists as evidence for the framework, not as a standalone finished work.
 
@@ -2186,12 +2251,13 @@ It is a destination that should emerge from actual friction.
 
 ## Worked Example: What This Repository Actually Has
 
-*(Updated 2026-09-03 — the version of this section that shipped with the original v2 draft was
-already stale within a week: it called `evals/`, `experiments/`, `patterns/`, and `templates/`
-"scaffolded, empty," described `claude/` with no leading dot, and omitted the Skills/Agent/Rule
-frontmatter question entirely. A worked example titled "what this repository actually has" that
-stops matching the repository is exactly the failure this section exists to name — so it gets
-corrected in place, not left as a period artifact.)*
+*(Updated 2026-09-03, then again 2026-09-06 — this section has now been corrected twice within two
+weeks of the original v2 draft shipping, which is itself worth naming rather than hiding: a worked
+example titled "what this repository actually has" drifting out of date is exactly the failure
+this section exists to demonstrate, not something the section itself is immune to. The 2026-09-03
+pass fixed `claude/` → `.claude/` and the scaffolded-directory claims; this pass reflects the book
+canonicalization (`manuscript.md` + `archive/`, this document's own new filename) and a populated
+Friction Ledger.)*
 
 The tree above is a destination, deliberately larger than any real Day One repository should be.
 Here is what this repository — the one containing this book — actually has today, for honest
@@ -2202,12 +2268,14 @@ Metavibing/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md
-├── FRICTION_LEDGER.md           # template only, no entries yet
+├── FRICTION_LEDGER.md           # live — 5 real entries from this repo's own history
 │
 ├── book/
-│   ├── MetaVibing_Provisional_Booklet_v2.md   # this document
-│   ├── MetaVibing_Provisional_Booklet_v1.{md,docx,pdf}
-│   └── metavibing-manual.md
+│   ├── manuscript.md            # this document — canonical source
+│   ├── README.md                # explains the book pipeline
+│   └── archive/
+│       ├── v1/                  # prior packaged edition (.md/.docx/.pdf)
+│       └── original/            # original manuscript (.docx) and its direct conversion
 │
 ├── examples/
 │   └── taskflow/
@@ -2232,8 +2300,8 @@ Metavibing/
 │       ├── checker.py           # working CLI; not yet wrapped as MCP
 │       └── test_checker.py
 │
-├── evals/
-│   └── baseline/README.md       # the frozen evaluation charter — the 18-trial run has not happened
+├── evals/                       # pilot design: charter, frozen task prompts, acceptance tests,
+│                                 # rubric, machine-readable protocol.yaml — not yet frozen/run
 │
 └── governance/                  # Governed HyRI v0 provenance records
 ```

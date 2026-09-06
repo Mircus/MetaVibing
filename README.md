@@ -6,7 +6,7 @@ Your AI makes a mistake. You correct it. Next week, it makes the same mistake ag
 
 MetaVibing turns a valuable correction into a persistent Rule, Skill, specialist Agent, or deterministic Check — so the *next* session inherits what you learned, instead of you saying it again.
 
-**[→ Try MetaVibing in 10 Minutes](docs/10-minute-metavibe.md)** · [Read the Manual](book/MetaVibing_Provisional_Booklet_v2.md) · [Evaluation Protocol](evals/baseline/README.md)
+**[→ Try MetaVibing in 10 Minutes](docs/10-minute-metavibe.md)** · [Read the Manual](book/manuscript.md) · [Evaluation Protocol](evals/baseline/README.md)
 
 > **Prompt engineering improves the current conversation. MetaVibing improves the next one.**
 
@@ -95,7 +95,8 @@ MetaVibing/
 │   └── 10-minute-metavibe.md     # start here
 │
 ├── book/                         # live
-│   └── MetaVibing_Provisional_Booklet_v2.md   # current draft (Markdown only)
+│   ├── manuscript.md             # canonical source
+│   └── archive/                  # prior edition + original manuscript, kept for reference
 │
 ├── examples/
 │   └── taskflow/                 # live — FastAPI/SQLite specimen, 8 passing tests
@@ -124,7 +125,7 @@ What doesn't exist: the trial runner, and the trials themselves. This will be re
 
 ## Manual
 
-*MetaVibing: Engineering Agents That Improve Their Own Working Environment* — [`book/MetaVibing_Provisional_Booklet_v2.md`](book/MetaVibing_Provisional_Booklet_v2.md), 16 parts:
+*MetaVibing — A Field Manual for Evolving Your AI Collaborator* — [`book/manuscript.md`](book/manuscript.md), 16 parts:
 
 | Part | Topic |
 |------|-------|
@@ -142,7 +143,7 @@ What doesn't exist: the trial runner, and the trials themselves. This will be re
 | XIV | The Central Discipline |
 | XV–XVI | Worked Examples, and MetaVibing as a Proof Specimen |
 
-The prior packaged edition (v1, `.md`/`.docx`/`.pdf`) and the original unexpanded manuscript are kept in `book/` for reference — superseded in content by v2.
+The prior packaged edition and the original unexpanded manuscript are kept in [`book/archive/`](book/archive/) for reference, never edited after being archived — see [`book/README.md`](book/README.md) for the full pipeline.
 
 **The Three-Strikes Rule**, from Part XIV: never suffer the same Claude failure three times. First occurrence — correct it. Second — diagnose it. Third — externalize it into a Rule, Skill, Agent, or Check.
 

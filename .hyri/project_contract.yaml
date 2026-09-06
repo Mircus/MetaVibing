@@ -25,11 +25,14 @@ global_goal: >
 
 source_artifacts:
   - id: original_manual_docx
-    path: book/The Claude MetaVibing Manual.docx
+    path: book/archive/original/The Claude MetaVibing Manual.docx
     role: original_manual
     required: true
+    # Path updated 2026-09-06: book/ canonicalized to manuscript.md +
+    # archive/{v1,original}/ (Mirco's call, direct instruction, not a
+    # governed run) — same file, moved, same content/hash.
   - id: booklet_v1
-    path: book/MetaVibing_Provisional_Booklet_v1.md
+    path: book/archive/v1/MetaVibing_Provisional_Booklet_v1.md
     role: prior_edition
     required: true
   - id: resolved_decision
@@ -41,11 +44,17 @@ source_artifacts:
 # explicitly rather than left implicit or improvised stage-by-stage.
 final_deliverables:
   - id: booklet_v2_md
-    path: book/MetaVibing_Provisional_Booklet_v2.md
+    path: book/manuscript.md
     # Governance-anchored expansion of v1: quotes the resolved core claim
     # verbatim, includes a Claims-to-Evidence table, marks results TBD
     # until real eval trials exist. DELIVERED 2026-08-25 (EXPANDED_DRAFT,
     # approved by Mirco) — see run_registry.json / project_rollup.json.
+    # Renamed book/MetaVibing_Provisional_Booklet_v2.md -> book/manuscript.md
+    # and given a new front-matter opening sequence 2026-09-06, by direct
+    # instruction (not a new governed run) — the recorded run_registry
+    # sha256 for this deliverable is now stale (content changed, not just
+    # path); project_rollup.py has not been rerun since. Flagged here so
+    # the next rollup run doesn't silently treat this as still matching.
   - id: eval_baseline_charter
     path: evals/baseline/README.md
     # DELIVERED 2026-08-24 — real governed PASS, validators confirmed.

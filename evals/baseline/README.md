@@ -202,7 +202,7 @@ Before MetaVibing v1 is announced publicly:
 - [ ] **Pooled Condition B M3 across T1+T3+T6 is ≥8/9** *(corrected 2026-09-04 — M3 is defined in §4 as pooled across all 9 Condition B task-trials, not 8/9 per individual task, which only has 3 trials each; the previous wording here contradicted the metric's own definition)* — not merely "pass on the mean/median trial." A pooled 6/9 with 3 failures hidden inside an average does not meet the gate.
 - [ ] **Condition B produces ≤ 2 architectural violations total** across T1 + T3 + T6 (combined across all trials).
 - [ ] Grader rubric (`evals/graders/rubric.md`) is documented and grading was blinded per §5.5.
-- [ ] `book/metavibing-manual.md` is human-reviewed and copyedited — not just mechanically extracted.
+- [ ] `book/manuscript.md` is human-reviewed and copyedited — not just mechanically extracted.
 - [ ] All companion repo examples run end-to-end from a clean `git clone` with documented setup.
 - [ ] The architecture-checker is documented clearly as a **standalone CLI only** for v1 (MCP server wrapper is a v1.1 item — see D6).
 - [ ] Results are reported and labeled as a **pilot** (one practitioner, 3 tasks) — not broad validation of AI-assisted engineering. See "Pilot, not confirmatory study" below.
