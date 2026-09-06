@@ -86,9 +86,35 @@ is where it should already be looked for.)*
 
 **Evaluation:** corrected + mechanically verified (each file's frontmatter parsed successfully as YAML matching the documented schema; verified as real UTF-8 bytes, not just console output). **Not behaviorally evaluated** — no real fresh-clone Claude Code session has confirmed `/meta`, `/ship-change`, and `final-reviewer` actually appear and load. That specific test is still open work, named here rather than silently assumed.
 
-**Status:** corrected, mechanically verified — behavioral evaluation still open
+#### 2026-09-06 — Behavioral evaluation
 
-**Closed date:** 2026-09-03 (mechanical tier only)
+Run in a real Claude Code session against a fresh checkout of `eb5725b` (working tree clean, `HEAD detached at eb5725b`) — not simulated.
+
+**`/meta` — PASS.** Invoking `Skill({skill: "meta"})` produced `Launching skill: meta`, `Base directory: .claude/skills/meta`, and injected the full body of `.claude/skills/meta/SKILL.md` verbatim into context. Executed the procedure for real (inventoried the stack, read the ledger, produced the documented summary format) — matches documented behavior exactly.
+
+**`/ship-change` — PASS.** Invoked with a real task ("add `test_get_task_not_found`, mirroring `test_get_user_not_found`" in `examples/taskflow/tests/test_tasks.py` — a genuine, pre-existing test-coverage gap). Loaded correctly (`Launching skill: ship-change`, full SKILL.md body injected, `ARGUMENTS:` passed through). Walked all 6 documented steps for real: Understand (scoped to one file, no ambiguity) → Implement (4-line Edit) → Test (`pip install -r requirements.txt`, then `pytest -q` → `9 passed, 1 warning in 1.49s`, up from 8, no pre-existing failures) → Inspect diff (`git status`/`git diff`, one file touched) → Review (delegated to `final-reviewer` subagent as documented) → Report (this entry). Test change was then reverted (`git checkout --`) since this was an activation test, not a development session; working tree confirmed clean afterward.
+
+**`final-reviewer` — PASS.** Agent tool discovery confirmed via the agent-types listing: `final-reviewer` appears with its exact frontmatter description and `(Tools: Read, Grep, Glob)`. Invoked with the real diff, task description, and rule pointers. Returned `## Final Review` in the exact documented output format, verdict `APPROVED`, with specific line-level correctness checks (verified `GET /tasks/{task_id}` at `main.py:83-88` actually raises 404) — not generic praise. Used exactly 3 tool calls, consistent with the `Read, Grep, Glob` allowlist; the frontmatter's tool restriction was not merely stated but structurally enforced (no Edit/Write/Bash occurred or was available).
+
+**TaskFlow path-scoped rule activation — FAIL. Root cause identified.** `.claude/rules/taskflow.md` used `globs: examples/taskflow/**/*` in its frontmatter. Its content was already present in this session's very first system-reminder, framed identically to CLAUDE.md ("project instructions, checked into the codebase") — *before* any file under `examples/taskflow/` had been read or touched. That is unconditional loading, not path-scoped activation.
+
+Verified against the primary source (`https://code.claude.com/docs/en/memory.md`, "Path-specific rules" section, fetched directly — not taken on a subagent's word alone): *"Rules can be scoped to specific files using YAML frontmatter with the `paths` field... Rules without a `paths` field are loaded unconditionally and apply to all files."* The supported key is `paths`, not `globs`. Since `globs` isn't a recognized key, Claude Code sees a rule with no `paths` field and loads it unconditionally — exactly the observed behavior.
+
+**Diagnosis:** When F-003 was originally closed (2026-09-03), the fix explicitly chose `globs` "over the documented-but-currently-buggy `paths` field" — i.e., a wrong key was substituted for a field believed (incorrectly, based on secondary web sources describing a narrower, differently-scoped bug in user-level `~/.claude/rules/`) to be broken, and this substitution was never behaviorally checked. The rule *is* discovered and its content *is* injected and *is* accurate — the only gap is the specific "path-scoped" activation claim in CLAUDE.md's Meta-Stack Reference table and the rule file's own header ("*Applies when working in `examples/taskflow/`*"), which did not hold. Net effect was low-severity (the rule ended up in context regardless, just always instead of conditionally, costing context budget rather than causing missed instructions) but the documentation claim was false as written.
+
+**Smallest root cause:** `.claude/rules/taskflow.md` frontmatter key should be `paths`, not `globs`. Not applied in the activation-test session itself — that session was an activation test, not a development session; the fix was named there rather than made, per instruction to diagnose and stop.
+
+#### 2026-09-06 (same day) — Fix applied
+
+Independently re-confirmed the primary-source claim above by fetching `code.claude.com/docs/en/memory.md` directly a second time before touching anything (the exact question that produced this bug once already — trusting a claim about this API without checking it directly was the original mistake, so re-verifying rather than reusing the fresh session's quote unchecked). Confirmed verbatim: *"Path-specific rules... Rules can be scoped to specific files using YAML frontmatter with the `paths` field... Rules without a `paths` field are loaded unconditionally."*
+
+Changed `.claude/rules/taskflow.md`'s frontmatter from `globs: examples/taskflow/**/*` to `paths:\n  - "examples/taskflow/**/*"` (list form, matching the documented example exactly). Also corrected the two other places that had documented `globs:` as the (wrong) convention: `book/MetaVibing_Provisional_Booklet_v2.md`'s worked-example tree comment and its Part XVI runnable-artifacts claim.
+
+**Not re-behaviorally-verified** — confirming the rule now genuinely activates only within `examples/taskflow/` (rather than just having valid, recognized frontmatter) would need another fresh Claude Code session, which has not been run. Structurally, the new key matches the documented schema and format exactly; that is mechanical verification, not behavioral confirmation.
+
+**Status:** corrected, mechanically verified — `/meta`, `/ship-change`, `final-reviewer` all fully behaviorally evaluated (PASS); the TaskFlow rule's frontmatter key is now fixed and mechanically verified against the documented schema, but the fix itself has not been behaviorally re-confirmed in a fresh session
+
+**Closed date:** 2026-09-03 (mechanical tier, original 4 artifacts); 2026-09-06 (behavioral tier — 3 of 4 components fully confirmed; TaskFlow rule's root cause found and fixed same day, behavioral re-confirmation of the fix still open)
 
 ---
 

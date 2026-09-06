@@ -2218,7 +2218,7 @@ Metavibing/
 │
 ├── .claude/                     # Claude Code's native config — this is what actually loads
 │   ├── rules/
-│   │   └── taskflow.md          # globs: examples/taskflow/**/*
+│   │   └── taskflow.md          # paths: [examples/taskflow/**/*]
 │   ├── skills/
 │   │   ├── meta/SKILL.md
 │   │   └── ship-change/SKILL.md
@@ -2863,7 +2863,7 @@ The following things have been concretely demonstrated as of this edition:
 
 **The MetaVibing meta-stack exists as runnable artifacts.** *(Correction, 2026-09-03: this claim was false when first written. The files existed but lived under `claude/` — not `.claude/` — and had no YAML frontmatter, so Claude Code could not actually load any of them as Skills, an Agent, or Rules. They were prose about the stack, not the stack. Fixed by moving each artifact to the path and frontmatter Claude Code actually requires; the claim below is true as of this correction, not as of the original edition.)* The companion repository contains:
 - `CLAUDE.md` with architectural constraints
-- `.claude/rules/taskflow.md` with path-scoped rules (`globs:` frontmatter)
+- `.claude/rules/taskflow.md` with path-scoped rules (`paths:` frontmatter — corrected 2026-09-06; a behavioral activation test found the originally-shipped `globs:` key isn't recognized by Claude Code at all, so the rule loaded unconditionally instead of only in `examples/taskflow/`. See FRICTION_LEDGER.md F-003)
 - `.claude/skills/ship-change/SKILL.md` with a disciplined change procedure (`name:`/`description:` frontmatter)
 - `.claude/skills/meta/SKILL.md` implementing `/meta`
 - `.claude/agents/final-reviewer.md` as a read-only specialist subagent (`tools: Read, Grep, Glob` frontmatter — enforced, not just stated)

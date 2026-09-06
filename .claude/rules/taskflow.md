@@ -1,5 +1,6 @@
 ---
-globs: examples/taskflow/**/*
+paths:
+  - "examples/taskflow/**/*"
 ---
 
 # Rules: TaskFlow Sandbox
