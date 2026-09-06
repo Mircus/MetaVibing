@@ -37,6 +37,7 @@ Rule / Skill / Agent / Check
        ↓
 Future work inherits the correction
 ```
+<!-- diagram: core-loop -->
 
 ## The Meta-Stack
 
@@ -51,6 +52,24 @@ Hard behavioral boundary        →  Permission / Hook
 Missing external capability     →  MCP
 Uncertain improvement           →  Evaluation
 ```
+<!-- diagram: meta-stack -->
+
+### The Friction → Artifact Map
+
+The same mapping, read the other way — starting from what went wrong:
+
+```
+FRICTION
+   │
+   ├── forgotten context      →  CLAUDE.md
+   ├── path-specific mistake  →  Rule
+   ├── repeated procedure     →  Skill
+   ├── specialist judgment    →  Agent
+   ├── objective invariant    →  Checker
+   ├── must-never-happen      →  Hook
+   └── external capability    →  Tool / MCP
+```
+<!-- diagram: friction-artifact -->
 
 ## A Five-Minute Example
 
@@ -67,7 +86,9 @@ def create_task(task: Task, session: Session = Depends(get_session)):
 
 It works. It's also a pattern a growing project wouldn't want repeated: harder to test in isolation, harder to change persistence later. The ordinary fix is to ask Claude for a new feature, notice it repeats the same pattern, and say: *"Don't put database access in the route handler — keep that in the repository layer."* That correction normally dies with the conversation.
 
+<!-- callout:practice -->
 Instead, look at what's already checked into this repository: `.claude/rules/taskflow.md`, scoped to `examples/taskflow/**/*`, states exactly that constraint. Because it's a native Claude Code Rule — not a comment, not a wiki page — it loads automatically the moment Claude works with a matching file. Ask for a new feature now (`/ship-change <task>`), and the Rule shapes the work without you restating anything.
+<!-- /callout -->
 
 One rung further: once a constraint can be checked mechanically, stop asking a model whether it was obeyed. `python mcp/architecture-checker/checker.py examples/taskflow` walks the actual code and reports every violation of this exact rule — judgment converted into infrastructure.
 
@@ -99,6 +120,7 @@ For the baseline evaluation, this is operationalised as: a practitioner with suf
 
 This edition references a companion repository at `examples/taskflow/` — a deliberately imperfect FastAPI + SQLite task manager designed to exercise the MetaVibing discipline. One governed execution of its declared test suite has been completed and confirmed:
 
+<!-- callout:evidence -->
 ```
 ============================= test session starts ==============================
 platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0
@@ -113,6 +135,7 @@ tests/test_tasks.py ........                                             [100%]
 **Execution metadata:** generated_by=governed_executor, exit_code=0, timed_out=False.
 
 This is the entirety of the confirmed execution evidence. It shows that the companion repository's declared test suite passes under a clean, governed execution environment. It does not show anything about the v1 release gates, the comparison between Condition A and Condition B, or the 3×3×2 baseline protocol — none of those runs have been completed.
+<!-- /callout -->
 
 ### What Has Not Been Validated
 
@@ -120,7 +143,9 @@ Readers must understand what this provisional booklet does **not** claim:
 
 **The 3×3×2 baseline protocol has not been run.** The evaluation charter (D3–D5) specifies 3 tasks × 3 trials × 2 conditions = 18 task-trials. As of this edition, only Condition A baseline environment has been confirmed to produce passing tests. No Condition B trials have been executed. No M1 (architectural violation rate), M2 (correction turns), or M3 (pytest pass rate on first submission) data has been collected for any trial.
 
+<!-- callout:warning -->
 **A prior readiness audit of the companion repository returned NO-GO.** The companion repository was reviewed under a structured audit protocol prior to this writing. That audit returned a NO-GO verdict. That verdict has not been superseded. It has been narrowly offset only by the single governed_execution proof above (8 tests passing, exit_code=0). The two coexist: one passing test run does not constitute blanket verification or readiness. Any reader working from this companion repo should consult the most recent readiness audit before treating it as a finished reference implementation.
+<!-- /callout -->
 
 **This booklet has not been human-reviewed and copyedited for the v1 gate.** Section 6 of the evaluation charter lists as a v1 release requirement: "`book/manuscript.md` is human-reviewed and copyedited — not just mechanically extracted." That gate is pending. This document is a machine-produced provisional draft.
 
@@ -366,7 +391,10 @@ Create something persistent.
 
 My preferred formulation is:
 
+<!-- callout:principle -->
 > Never suffer the same Claude failure three times.
+<!-- /callout -->
+<!-- diagram: three-strikes -->
 
 A mature MetaVibing environment gradually converts human irritation into machine-readable institutional memory.
 
@@ -3216,8 +3244,9 @@ Code builds the product. Meta-code builds the coder.
 | Companion repo tests (8 tests) pass | ✅ Confirmed | `examples/taskflow/test_logs/taskflow_tests.txt` — 8 passed in 0.63s, exit_code=0 |
 | Evaluation charter anchored to resolved decisions | ✅ Confirmed | `evals/baseline/README.md` references D1–D8, all resolved |
 | Meta-stack artifacts exist | ✅ Confirmed | CLAUDE.md, rules, skills, agents present in repo |
-| Architecture checker CLI works | ✅ Confirmed | Returns 17 violations on unmodified taskflow/src/ |
+| Architecture checker CLI works | ✅ Confirmed | Returns 20 violations (17 db-in-handler + 3 missing-test) on unmodified taskflow, project-root invocation |
 | Forbidden paths untouched in this production run | ✅ Confirmed | Governed executor: no writes to forbidden paths |
+| Grader rubric (`evals/graders/rubric.md`) | ✅ Confirmed (2026-09-04) | 7 atomic rule IDs, delta-based mechanical counting for 2 of 7 |
 
 ### Pending
 
@@ -3231,7 +3260,6 @@ Code builds the product. Meta-code builds the coder.
 | Human review and copyediting | ❌ Pending | Human gate open |
 | Companion repo full readiness | ❌ NO-GO (not superseded) | Prior audit verdict stands |
 | Architecture checker MCP server wrapper | ❌ v1.1 item | D6 |
-| Grader rubric (`evals/graders/rubric.md`) | ❌ Not produced | Subsequent charter stage |
 | Second-experimenter reproducibility check | ❌ Not attempted | No second experimenter yet |
 
 This table is honest. The version of this booklet that hid this table from you would be object substitution — reporting a more favorable state than the evidence supports.

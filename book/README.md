@@ -6,11 +6,14 @@
 book/
 ├── manuscript.md          ← canonical current source (Markdown)
 ├── README.md              ← this file
+├── assets/                ← logo + diagrams used by the built PDF/DOCX (generated, but committed)
 └── archive/
     ├── v1/                ← the prior packaged edition (.md, .docx, .pdf) — superseded in content by manuscript.md
     └── original/          ← the original unexpanded manuscript (.docx) and its direct Markdown conversion, predating MetaVibing's expansion
 
-dist/                      ← packaged releases (.pdf, .docx) — not built yet; a release step, not a source
+dist/                      ← packaged releases, built from manuscript.md:
+├── MetaVibing-Field-Manual-v0.1.pdf    ← the public reading artifact
+└── MetaVibing-Field-Manual-v0.1.docx   ← secondary; optimized for PDF first
 ```
 
 ## Why this shape
@@ -21,4 +24,11 @@ Before this reorganization, `book/` held five different manuscript-shaped files 
 
 ## Building a release
 
-`dist/` will hold generated `.pdf`/`.docx` packages once one is built from `manuscript.md` — this hasn't happened yet for the current manuscript. Do not hand-edit anything under `dist/`; regenerate it from `manuscript.md` instead.
+```bash
+python scripts/gen_assets.py     # regenerate the logo + 4 diagrams (only needed if these change)
+python scripts/build_manual.py   # rebuild dist/MetaVibing-Field-Manual-v0.1.{pdf,docx} from manuscript.md
+```
+
+Requires `reportlab`, `python-docx`, `matplotlib`, and `Pillow` (all pure-Python, no native dependencies beyond what pip installs). Do not hand-edit anything under `dist/` — regenerate it from `manuscript.md` instead, or the two will drift.
+
+The build is a small custom Markdown parser (`scripts/md_parse.py`) plus two renderers, not a general-purpose tool — it supports exactly what `manuscript.md` uses: headings, code fences, blockquotes, tables, lists, and two custom directives: `<!-- diagram: NAME -->` (renders one of the four `book/assets/diagram-*.png` files) and `<!-- callout:TYPE -->...<!-- /callout -->` (PRINCIPLE / PRACTICE / WARNING / EVIDENCE colored boxes). Both directives are HTML comments, so they render as nothing when the manuscript is read as plain Markdown on GitHub.

@@ -1,3 +1,5 @@
+<img src="book/assets/logo.png" alt="MetaVibing" width="90" />
+
 # MetaVibing
 
 **Stop correcting your AI. Start evolving the environment it works in.**
@@ -6,7 +8,7 @@ Your AI makes a mistake. You correct it. Next week, it makes the same mistake ag
 
 MetaVibing turns a valuable correction into a persistent Rule, Skill, specialist Agent, or deterministic Check — so the *next* session inherits what you learned, instead of you saying it again.
 
-**[→ Try MetaVibing in 10 Minutes](docs/10-minute-metavibe.md)** · [Read the Manual](book/manuscript.md) · [Evaluation Protocol](evals/baseline/README.md)
+**[→ Try MetaVibing in 10 Minutes](docs/10-minute-metavibe.md)** · [📖 Download the Field Manual — PDF](dist/MetaVibing-Field-Manual-v0.1.pdf) · [DOCX](dist/MetaVibing-Field-Manual-v0.1.docx) · [Evaluation Protocol](evals/baseline/README.md)
 
 > **Prompt engineering improves the current conversation. MetaVibing improves the next one.**
 
@@ -125,7 +127,7 @@ What doesn't exist: the trial runner, and the trials themselves. This will be re
 
 ## Manual
 
-*MetaVibing — A Field Manual for Evolving Your AI Collaborator* — [`book/manuscript.md`](book/manuscript.md), 16 parts:
+*MetaVibing — A Field Manual for Evolving Your AI Collaborator*, 16 parts. **[Download the built PDF](dist/MetaVibing-Field-Manual-v0.1.pdf)** for reading; [`book/manuscript.md`](book/manuscript.md) is the Markdown source, for editors and diffs.
 
 | Part | Topic |
 |------|-------|
