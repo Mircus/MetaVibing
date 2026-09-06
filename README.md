@@ -42,7 +42,7 @@ Future work inherits the correction
 
 A better prompt makes *this* conversation go well. It doesn't survive a new session, a new task, or a teammate who never saw it. MetaVibing takes the same correction and gives it a durable, checked-in form — so it's part of the environment the next session starts from, not something anyone has to remember to repeat.
 
-**[→ Try it yourself in 10 minutes](docs/10-minute-metavibe.md)** — clone the repo, watch a real correction happen, and turn it into a Rule live.
+**[→ Try it yourself in 10 minutes](docs/10-minute-metavibe.md)** — clone the repo, see how a past correction became a persistent Rule, and watch that Rule shape a new task.
 
 ---
 
@@ -62,19 +62,19 @@ Uncertain improvement           →  Evaluation
 
 ## What Exists Today
 
-- ✓ **Rules** — live, natively loaded from `.claude/rules/`
+- ✓ **Rules** — native Claude Code project Rules, loaded from `.claude/rules/`; path-scoping corrected and mechanically verified (behavioral re-confirmation in a fresh session pending — see `FRICTION_LEDGER.md` F-003)
 - ✓ **Skills** — live (`/meta`, `/ship-change`)
 - ✓ **A specialist Agent** — live (`final-reviewer`), structurally read-only (`tools: Read, Grep, Glob` — enforced, not just stated)
 - ✓ **A deterministic checker** — live, standalone CLI, with its own unit tests and a real committed violation baseline
 - ✓ **TaskFlow** — a real, runnable FastAPI/SQLite specimen with a passing 8-test baseline suite
-- ✓ **A preregistered evaluation pilot** — frozen tasks, held-out acceptance tests, a grading rubric, and a machine-readable protocol, published *before* any result exists
+- ✓ **A preregistered evaluation pilot design** — tasks, acceptance tests, a grading rubric, and a machine-readable protocol, published *before* any result exists
 - ✓ **A Friction Ledger** — [`FRICTION_LEDGER.md`](FRICTION_LEDGER.md), 5 real entries from this repository's own history, including a real activation bug a behavioral test caught and this project fixed on itself
 
 ## What Does Not Exist Yet
 
 - ○ **Hooks** — none implemented
 - ○ **A real MCP server** — the checker is CLI-only today; an MCP wrapper is a v1.1 item
-- ○ **Completed A/B evidence** — the 18-trial pilot is frozen and ready to run, not run
+- ○ **Executed A/B evidence** — the experimental design is published and stable; the runner, formal freeze tag, and the 18 trials themselves remain to be completed
 - ○ **Ablations / held-out tasks / multi-practitioner replication** — deliberately deferred until after the first pilot
 - ○ **`experiments/`, `patterns/`, `templates/`** — described in the manual as the eventual destination, not created here yet
 
@@ -103,13 +103,13 @@ MetaVibing/
 ├── .claude/                      # Claude Code's native config — this is what actually loads
 │   ├── rules/                    # live
 │   ├── skills/                   # live — /meta, /ship-change
-│   ├── agents/                   # partial — final-reviewer
+│   ├── agents/                   # live — final-reviewer
 │   └── hooks/                    # planned — none implemented yet
 │
 ├── mcp/
 │   └── architecture-checker/     # live as a standalone CLI; MCP wrapper planned for v1.1
 │
-├── evals/                        # live — frozen pilot: tasks, acceptance tests, rubric, protocol.yaml
+├── evals/                        # live — pilot design: tasks, acceptance tests, rubric, protocol.yaml (design published; not yet frozen or run)
 │
 └── governance/                   # provenance records — see governance/ if you care how this repo's artifacts were produced
 ```
@@ -118,7 +118,7 @@ MetaVibing/
 
 MetaVibing's central claim — that this discipline reduces architectural drift, correction turns, and first-try failure rate compared to working without it — is **falsifiable and not yet tested.**
 
-What exists: a frozen, preregistered pilot — [`evals/baseline/README.md`](evals/baseline/README.md) (the charter: core claim, tasks, metrics, protocol) and [`evals/protocol.yaml`](evals/protocol.yaml) (the machine-readable contract: hashes, RNG-generated trial order, formulas). Three tasks, held-out acceptance tests the model never sees, a rubric with atomic rule IDs, 18 trials (3 tasks × 3 trials × 2 conditions).
+What exists: a preregistered pilot design — [`evals/baseline/README.md`](evals/baseline/README.md) (the charter: core claim, tasks, metrics, protocol) and [`evals/protocol.yaml`](evals/protocol.yaml) (the machine-readable contract: hashes, RNG-generated trial order, formulas). Three tasks, a rubric with atomic rule IDs, and acceptance tests excluded from the task prompts and specified to run from an evaluator-only checkout under the frozen protocol — 18 trials in total (3 tasks × 3 trials × 2 conditions).
 
 What doesn't exist: the trial runner, and the trials themselves. This will be reported as a **pilot** — one practitioner, non-held-out tasks — not a confirmatory study, with results published whether or not they're flattering.
 
@@ -148,7 +148,7 @@ The prior packaged edition (v1, `.md`/`.docx`/`.pdf`) and the original unexpande
 
 ## Roadmap
 
-Run the frozen pilot → publish the results, including if they're not flattering → then hooks, a real MCP server, and ablations, each built because the evidence calls for it, not to fill out the diagram.
+Freeze and run the pilot → publish the results, including if they're not flattering → then hooks, a real MCP server, and ablations, each built because the evidence calls for it, not to fill out the diagram.
 
 ---
 
