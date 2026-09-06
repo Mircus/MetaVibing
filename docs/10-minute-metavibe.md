@@ -41,6 +41,13 @@ pytest
 
 You should see 8 tests pass. TaskFlow is a controlled sandbox: a small, real FastAPI + SQLite app that works, but contains architectural friction preserved on purpose — it exists specifically so MetaVibing has something concrete to demonstrate against.
 
+Now go back to the repository root and start Claude Code there — everything from here on (the Rule, the Skills, the checker) is referenced relative to the repo root, not `examples/taskflow/`:
+
+```bash
+cd ../..
+claude
+```
+
 ---
 
 ## 2. Meet the problem — 1 minute
@@ -95,7 +102,7 @@ Open `.claude/rules/taskflow.md`. The correction from Section 3 is already there
 Database access belongs in the repository layer — not in route handlers.
 ```
 
-This file isn't documentation about a convention — it's loaded natively by Claude Code, scoped by its own frontmatter (`paths: ["examples/taskflow/**/*"]`) to activate specifically when you're working inside `examples/taskflow/`. The correction from a past conversation is now part of *this* conversation's environment, automatically, before you say a word.
+This file isn't documentation about a convention — it's loaded natively by Claude Code. Its frontmatter (`paths: ["examples/taskflow/**/*"]`) scopes it: when Claude works with a file matching that pattern, Claude Code loads the Rule automatically. You don't have to restate the architectural correction in the prompt — the correction from a past conversation is now part of *this* conversation's environment the moment you touch TaskFlow.
 
 That's the first "aha."
 
@@ -111,7 +118,7 @@ Try it on a real, small task:
 /ship-change Add an endpoint: POST /users/{user_id}/complete-all-tasks — marks every task belonging to that user as done, and returns the count of tasks updated.
 ```
 
-Watch it work through the six steps `.claude/skills/ship-change/SKILL.md` documents. Then check the diff — the new handler calls into the same repository-layer pattern the Rule requires, without you repeating the instruction from Section 3 at all. The Rule did the work this time.
+Watch it work through the six steps `.claude/skills/ship-change/SKILL.md` documents. Then inspect the diff yourself: does the new handler keep database access out of the route, without you repeating the instruction from Section 3 at all? If yes, the persistent Rule influenced the work without you restating it. If not, you've just discovered new friction — which is exactly what MetaVibing is designed to capture and escalate, not something to paper over.
 
 For a wider inventory of what's accumulated in the project's meta-stack, and what friction hasn't been turned into structure yet:
 
