@@ -6,7 +6,7 @@
 book/
 ├── manuscript.md          ← canonical current source (Markdown)
 ├── README.md              ← this file
-├── assets/                ← logo + diagrams used by the built PDF/DOCX (generated, but committed)
+├── assets/                ← logo (real designed asset) + 4 diagrams (generated); all committed
 └── archive/
     ├── v1/                ← the prior packaged edition (.md, .docx, .pdf) — superseded in content by manuscript.md
     └── original/          ← the original unexpanded manuscript (.docx) and its direct Markdown conversion, predating MetaVibing's expansion
@@ -25,7 +25,9 @@ Before this reorganization, `book/` held five different manuscript-shaped files 
 ## Building a release
 
 ```bash
-python scripts/gen_assets.py     # regenerate the logo + 4 diagrams (only needed if these change)
+python scripts/gen_assets.py     # regenerate the 4 diagrams (only needed if these change) --
+                                  # does NOT touch logo.png, which is a real designed asset,
+                                  # not a build output; replace that file directly if it changes
 python scripts/build_manual.py   # rebuild dist/MetaVibing-Field-Manual-v0.1.{pdf,docx} from manuscript.md
 ```
 
