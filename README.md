@@ -94,6 +94,7 @@ MetaVibing/
 ├── LICENSE
 ├── CLAUDE.md
 ├── CHANGELOG.md
+├── CONTRIBUTORS.md
 ├── FRICTION_LEDGER.md            # live — 5 real entries from this repo's own history
 │
 ├── .github/workflows/ci.yml      # TaskFlow tests, checker tests, frontmatter checks, manual build
@@ -161,6 +162,12 @@ The prior packaged edition and the original unexpanded manuscript are kept in [`
 ## Roadmap
 
 Freeze and run the pilot → publish the results, including if they're not flattering → then hooks, a real MCP server, and ablations, each built because the evidence calls for it, not to fill out the diagram.
+
+---
+
+## Contributors
+
+Created by **Mirco A. Mannucci, PhD** (HoloMathics, LLC), built through direct, disclosed collaboration with Claude Code — see Part XVI of the manual and [`FRICTION_LEDGER.md`](FRICTION_LEDGER.md) for the honest account of that process. Full credits and how to add yourself: [`CONTRIBUTORS.md`](CONTRIBUTORS.md). Want to contribute? Start with [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
