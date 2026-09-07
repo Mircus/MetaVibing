@@ -21,9 +21,6 @@ ASSETS = ROOT / "book" / "assets"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
 
-VERSION_LABEL = "v0.1.0-alpha.1 — Alpha Research Preview"
-TITLE = "MetaVibing"
-SUBTITLE = "A Field Manual for Evolving Your AI Collaborator"
 
 INDIGO = "#4F46E5"
 TEAL = "#0D9488"
@@ -50,18 +47,48 @@ CALLOUT_COLORS = {
 PART_RE = re.compile(r"^Part\s+[IVXLC]+\b")
 
 
-def load_blocks():
+def load_cover_and_blocks():
+    """
+    Parses the manuscript's own cover block (title, subtitle, author,
+    version -- everything before the first `---`) instead of hardcoded
+    constants, so cover text can never drift from what manuscript.md
+    actually says. Returns (cover_dict, remaining_body_blocks) -- the
+    remaining blocks start *after* the cover's closing `hr`, so cover
+    lines are never also rendered a second time as body paragraphs.
+    """
     text = MANUSCRIPT.read_text(encoding="utf-8")
     blocks = parse(text)
     assert blocks[0][0] == "h1", "manuscript must start with a single # title"
-    return blocks[1:]  # drop the h1 -- cover is built separately
+
+    cover = {"title": blocks[0][1], "subtitle": None, "author": None, "version": None}
+    i = 1
+    p_seen = 0
+    while i < len(blocks) and blocks[i][0] != "hr":
+        kind = blocks[i]
+        if kind[0] == "h3" and cover["subtitle"] is None:
+            cover["subtitle"] = strip_inline(kind[1])
+        elif kind[0] == "p":
+            text_val = strip_inline(kind[1])
+            if p_seen == 0:
+                cover["author"] = text_val
+            elif p_seen == 1:
+                cover["version"] = text_val
+            p_seen += 1
+        i += 1
+    if i < len(blocks) and blocks[i][0] == "hr":
+        i += 1  # step past the cover-closing hr
+
+    for key in ("subtitle", "author", "version"):
+        assert cover[key], f"manuscript cover is missing its {key} line"
+
+    return cover, blocks[i:]
 
 
 # ═════════════════════════════════════════════════════════════════════════
 # PDF (reportlab)
 # ═════════════════════════════════════════════════════════════════════════
 
-def build_pdf(blocks, out_path):
+def build_pdf(cover, blocks, out_path):
     from reportlab.lib.pagesizes import LETTER
     from reportlab.lib.units import inch
     from reportlab.lib import colors
@@ -115,15 +142,19 @@ def build_pdf(blocks, out_path):
         img.hAlign = "CENTER"
         story.append(img)
     story.append(Spacer(1, 0.5 * inch))
-    story.append(Paragraph(TITLE, pstyle("CoverTitle", fontName="Helvetica-Bold",
+    story.append(Paragraph(cover["title"], pstyle("CoverTitle", fontName="Helvetica-Bold",
                                           fontSize=38, leading=46, alignment=TA_CENTER,
                                           textColor=colors.HexColor(INDIGO))))
     story.append(Spacer(1, 0.25 * inch))
-    story.append(Paragraph(SUBTITLE, pstyle("CoverSub", fontName="Helvetica",
+    story.append(Paragraph(cover["subtitle"], pstyle("CoverSub", fontName="Helvetica",
                                              fontSize=15, leading=20, alignment=TA_CENTER,
                                              textColor=colors.HexColor(DARK))))
+    story.append(Spacer(1, 0.3 * inch))
+    story.append(Paragraph(cover["author"], pstyle("CoverAuthor", fontName="Helvetica-Bold",
+                                             fontSize=12.5, leading=16, alignment=TA_CENTER,
+                                             textColor=colors.HexColor(DARK))))
     story.append(Spacer(1, 0.4 * inch))
-    story.append(Paragraph(VERSION_LABEL, pstyle("CoverVersion", fontName="Helvetica-Bold",
+    story.append(Paragraph(cover["version"], pstyle("CoverVersion", fontName="Helvetica-Bold",
                                                   fontSize=11, leading=14, alignment=TA_CENTER,
                                                   textColor=colors.HexColor(TEAL))))
     story.append(NextPageTemplate("Body"))
@@ -254,7 +285,7 @@ def build_pdf(blocks, out_path):
         canvas.setFont("Helvetica", 8.5)
         canvas.setFillColor(colors.HexColor(GRAY))
         canvas.drawString(MARGIN, PAGE_H - 0.48 * inch, "MetaVibing — Field Manual")
-        canvas.drawRightString(PAGE_W - MARGIN, PAGE_H - 0.48 * inch, VERSION_LABEL)
+        canvas.drawRightString(PAGE_W - MARGIN, PAGE_H - 0.48 * inch, cover["version"])
         canvas.setFont("Helvetica", 9)
         canvas.drawCentredString(PAGE_W / 2, 0.55 * inch, str(canvas.getPageNumber()))
         canvas.restoreState()
@@ -265,7 +296,7 @@ def build_pdf(blocks, out_path):
     doc = BaseDocTemplate(str(out_path), pagesize=LETTER,
                            leftMargin=MARGIN, rightMargin=MARGIN,
                            topMargin=MARGIN, bottomMargin=MARGIN,
-                           title=TITLE, author="MetaVibing")
+                           title=cover["title"], author=cover["author"])
     cover_frame = Frame(MARGIN, MARGIN, PAGE_W - 2 * MARGIN, PAGE_H - 2 * MARGIN, id="cover")
     body_frame = Frame(MARGIN, MARGIN, PAGE_W - 2 * MARGIN, PAGE_H - 2 * MARGIN, id="body")
     doc.addPageTemplates([
@@ -280,7 +311,7 @@ def build_pdf(blocks, out_path):
 # DOCX (python-docx)
 # ═════════════════════════════════════════════════════════════════════════
 
-def build_docx(blocks, out_path):
+def build_docx(cover, blocks, out_path):
     import docx
     from docx import Document
     from docx.shared import Pt, Inches, RGBColor
@@ -307,8 +338,8 @@ def build_docx(blocks, out_path):
         run._r.append(fld_end)
 
     doc = Document()
-    doc.core_properties.title = TITLE
-    doc.core_properties.author = "MetaVibing"
+    doc.core_properties.title = cover["title"]
+    doc.core_properties.author = cover["author"]
 
     section = doc.sections[0]
     section.left_margin = section.right_margin = Inches(0.9)
@@ -341,20 +372,27 @@ def build_docx(blocks, out_path):
         p.add_run().add_picture(str(logo_path), width=Inches(1.3))
     title_p = doc.add_paragraph()
     title_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = title_p.add_run(TITLE)
+    r = title_p.add_run(cover["title"])
     r.font.size = Pt(34)
     r.font.bold = True
     r.font.color.rgb = hexc(INDIGO)
 
     sub_p = doc.add_paragraph()
     sub_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = sub_p.add_run(SUBTITLE)
+    r = sub_p.add_run(cover["subtitle"])
     r.font.size = Pt(14)
+    r.font.color.rgb = hexc(DARK)
+
+    author_p = doc.add_paragraph()
+    author_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    r = author_p.add_run(cover["author"])
+    r.font.size = Pt(12.5)
+    r.font.bold = True
     r.font.color.rgb = hexc(DARK)
 
     ver_p = doc.add_paragraph()
     ver_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = ver_p.add_run(VERSION_LABEL)
+    r = ver_p.add_run(cover["version"])
     r.font.size = Pt(11)
     r.font.bold = True
     r.font.color.rgb = hexc(TEAL)
@@ -508,6 +546,6 @@ def build_docx(blocks, out_path):
 
 
 if __name__ == "__main__":
-    blocks = load_blocks()
-    build_pdf(blocks, DIST / "MetaVibing-Field-Manual-v0.1.pdf")
-    build_docx(blocks, DIST / "MetaVibing-Field-Manual-v0.1.docx")
+    cover, blocks = load_cover_and_blocks()
+    build_pdf(cover, blocks, DIST / "MetaVibing-Field-Manual-v0.1.pdf")
+    build_docx(cover, blocks, DIST / "MetaVibing-Field-Manual-v0.1.docx")

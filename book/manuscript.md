@@ -2,6 +2,8 @@
 
 ### A Field Manual for Evolving Your AI Collaborator
 
+**Mirco A. Mannucci, PhD, HoloMathics, LLC**
+
 *MetaVibing v0.1.0-alpha.1 — Alpha Research Preview*
 
 ---
