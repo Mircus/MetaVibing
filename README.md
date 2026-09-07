@@ -1,4 +1,4 @@
-<img src="book/assets/logo.png" alt="MetaVibing" width="200" />
+<img src="book/assets/logo.png" alt="MetaVibing" width="600" />
 
 # MetaVibing
 
