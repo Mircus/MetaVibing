@@ -1,25 +1,26 @@
 # MetaVibing — Project Operating Instructions
 
-This is the MetaVibing companion repository. It contains a practical manual and a runnable example (TaskFlow) for engineering agents that improve their own working environment. `experiments/`, `templates/`, and published benchmarks are the book's described destination, not yet present here — see README Status.
+This repository contains a practical manual (`book/`) and a runnable example (`examples/taskflow/`) for engineering agents that improve their own working environment. It also uses its own method on itself — the meta-stack below is Claude Code's real, native configuration for this repository, not documentation about a configuration.
 
 ---
 
 ## Architecture
 
-- **Demo application**: `examples/taskflow/` — FastAPI + SQLite + pytest (live)
-- **Meta-code artifacts**: `.claude/` — rules, skills (live); agents (partial); hooks (planned, none implemented yet). This is the executable configuration Claude Code natively loads — not a separate documentation tree.
-- **MCP tools**: `mcp/architecture-checker/` — live as a standalone CLI; MCP server wrapper is planned for v1.1
-- **Evaluation framework**: `evals/baseline/` — charter written (live); the 18-trial run and `tasks/`/`graders/`/`results/` are planned, not yet executed or created
-- **Experiments**: `experiments/` — planned, described in the book, does not exist in this repository yet
+- **Manual**: `book/manuscript.md` — canonical source; built to `dist/` as PDF/DOCX (`scripts/build_manual.py`)
+- **Demo application**: `examples/taskflow/` — FastAPI + SQLite + pytest
+- **Meta-code artifacts**: `.claude/` — Rules and Skills, natively loaded; `final-reviewer` Agent, structurally read-only
+- **Architecture checker**: `tools/architecture-checker/` — a standalone CLI, not an MCP server (the directory isn't named `mcp/` for exactly that reason)
+- **Evaluation pilot**: `evals/` — frozen task prompts, held-out acceptance tests, a grading rubric, and a machine-readable protocol (`evals/protocol.yaml`); the 18-trial run itself has not happened yet
 
 ---
 
 ## Development
 
-Install sandbox project:
+Install and run the sandbox project:
 ```bash
 cd examples/taskflow
 pip install -r requirements.txt
+uvicorn src.main:app --reload
 ```
 
 Run sandbox tests:
@@ -28,9 +29,15 @@ cd examples/taskflow
 pytest
 ```
 
-Run architecture checker (from repo root):
+Run the architecture checker (from repo root — pass the project root, not `src/`):
 ```bash
-python mcp/architecture-checker/checker.py examples/taskflow
+python tools/architecture-checker/checker.py examples/taskflow
+```
+
+Rebuild the manual (from repo root):
+```bash
+pip install -r requirements-dev.txt
+python scripts/build_manual.py
 ```
 
 ---
@@ -40,7 +47,7 @@ python mcp/architecture-checker/checker.py examples/taskflow
 - Make the **smallest change** that solves the requested problem.
 - Do **not** refactor unrelated files.
 - Do **not** claim success until relevant verification has run.
-- Do **not** touch `examples/taskflow/` when working on `mcp/` or `.claude/`, and vice versa.
+- Do **not** touch `examples/taskflow/` when working on `tools/` or `.claude/`, and vice versa.
 
 ---
 
@@ -72,7 +79,7 @@ When you observe a pattern of repeated mistakes:
 1. Log it under a new entry (F-XXX format).
 2. Classify the failure type.
 3. Propose a candidate intervention.
-4. Track the evaluation result after applying the intervention.
+4. Track the evaluation result after applying the intervention — graded corrected / mechanically verified / behaviorally evaluated, not a single undifferentiated "done."
 
 ---
 
@@ -83,9 +90,9 @@ When you observe a pattern of repeated mistakes:
 | CLAUDE.md | Persistent doctrine | `./CLAUDE.md` | Live |
 | Rules | Path-scoped context | `.claude/rules/` | Live |
 | Skills | Reusable procedures | `.claude/skills/` | Live |
-| Agents | Specialist subagents | `.claude/agents/` | Partial |
-| Hooks | Hard behavioral boundaries | `.claude/hooks/` | Planned — none implemented yet |
-| MCP tools | External capabilities | `mcp/` | Partial — architecture-checker is a standalone CLI; MCP wrapper planned for v1.1 |
+| Agent | Specialist, read-only review | `.claude/agents/final-reviewer.md` | Live |
+| Architecture checker | Deterministic invariant check | `tools/architecture-checker/` | Live (CLI only) |
+| Hooks | Hard behavioral boundaries | — | Not present — build one when a Friction Ledger entry demands it, not before |
 
 ---
 

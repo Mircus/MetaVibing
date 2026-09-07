@@ -1,0 +1,10 @@
+# Dev-only dependencies for building the manual and running its tooling.
+# Not needed to run TaskFlow itself — see examples/taskflow/requirements.txt
+# for that. All pure-Python; no native system libraries required.
+
+reportlab>=4.4,<5
+python-docx>=1.2,<2
+matplotlib>=3.10,<4
+Pillow>=11,<12
+pytest>=8.2,<9
+PyYAML>=6,<7

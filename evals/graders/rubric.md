@@ -4,9 +4,9 @@ Frozen apparatus (`evals/protocol.yaml` records its sha256). "Count architectura
 
 ## Design principle: mechanical where possible
 
-Two of the seven rule IDs below (**A1**, **R1**) are already checked deterministically by `mcp/architecture-checker/checker.py`. For those, **the checker's output is the M1 count — the human grader does not re-count them by hand.** This isn't a shortcut: it removes exactly the kind of "is that one violation or three" ambiguity a human grader would otherwise have to arbitrate, and it makes that portion of M1 reproducible by construction. The remaining five rule IDs (A2, A3, S1, S2, D1) have no mechanical detector and are graded by the human reviewer, following the counting unit specified for each.
+Two of the seven rule IDs below (**A1**, **R1**) are already checked deterministically by `tools/architecture-checker/checker.py`. For those, **the checker's output is the M1 count — the human grader does not re-count them by hand.** This isn't a shortcut: it removes exactly the kind of "is that one violation or three" ambiguity a human grader would otherwise have to arbitrate, and it makes that portion of M1 reproducible by construction. The remaining five rule IDs (A2, A3, S1, S2, D1) have no mechanical detector and are graded by the human reviewer, following the counting unit specified for each.
 
-**A1/R1 count is a delta against the frozen baseline, not the checker's absolute output.** *(Correction, 2026-09-04: TaskFlow is deliberately born with ~20 checker violations — see `mcp/architecture-checker/check_logs/taskflow_baseline.json`. Using the checker's raw count would make every trial, even an untouched one, start around 20 against a Condition B threshold of ≤2 — an impossible bar that has nothing to do with what the trial actually did.)* Compute:
+**A1/R1 count is a delta against the frozen baseline, not the checker's absolute output.** *(Correction, 2026-09-04: TaskFlow is deliberately born with ~20 checker violations — see `tools/architecture-checker/check_logs/taskflow_baseline.json`. Using the checker's raw count would make every trial, even an untouched one, start around 20 against a Condition B threshold of ≤2 — an impossible bar that has nothing to do with what the trial actually did.)* Compute:
 
 ```
 A1/R1 count for a trial = violations present in the trial's checker output
@@ -36,7 +36,7 @@ A single line of a diff can trigger at most one rule ID. If a line is arguably b
 ## Grading procedure
 
 1. Run the checker against the trial's final `examples/taskflow/` (project root, not `src/` — see the checker's own docstring for why that distinction matters).
-2. Diff the trial's violations against `mcp/architecture-checker/check_logs/taskflow_baseline.json` by `(rule, file, snippet)` fingerprint. The A1+R1 count is what's new — present in the trial, absent from the baseline. Record the absolute count too, but it is not M1.
+2. Diff the trial's violations against `tools/architecture-checker/check_logs/taskflow_baseline.json` by `(rule, file, snippet)` fingerprint. The A1+R1 count is what's new — present in the trial, absent from the baseline. Record the absolute count too, but it is not M1.
 3. The human grader reads the blinded diff (see `evals/baseline/README.md` §5.5 — condition hidden until scoring is sealed) and separately counts A2, A3, S1, S2, D1 using the units above.
 4. Record all seven counts individually in the trial's result file, not just the M1 total — a trial with 2×A1 and 0 elsewhere is a different result from 0×A1 and 2×S2, even though both sum to 2.
 5. M1 = sum of all seven counts for that trial (A1/R1 already delta-adjusted per step 2).

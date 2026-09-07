@@ -1,10 +1,9 @@
 # MetaVibing — Baseline Evaluation Charter
 
-**Decision gate:** dec-e84f9216 (resolved 2026-08-24)  
 **Charter version:** v1.0  
-**Governed by:** Mirco's resolutions D1–D8 (see `.hyri/decision_gate_dec-e84f9216_resolved.md`)
+**Resolved by:** Mirco, 2026-08-24
 
-This charter defines what the MetaVibing baseline evaluation covers, how it is run, and what constitutes a passing result. It is a direct consequence of the decisions made in the Evaluation Charter gate — not a speculative design. Every section traces back to a resolved decision.
+This charter defines what the MetaVibing baseline evaluation covers, how it is run, and what constitutes a passing result. It is a direct consequence of decisions made deliberately, not a speculative design. The D-numbered references throughout (D1, D2, ...) trace each section back to a specific one of those decisions — historical process detail, kept for provenance, not load-bearing for using this charter today.
 
 ---
 
@@ -127,7 +126,7 @@ Three metrics are collected per condition, per task (D4):
 - `CLAUDE.md` populated from the manual's template (full architectural constraints active — see [`CLAUDE.md`](../../CLAUDE.md) for the current canonical version).
 - All path-scoped Rules active (sourced from `.claude/rules/`, loaded natively by Claude Code).
 - The `/ship-change` Skill and `final-reviewer` subagent (`.claude/skills/ship-change/`, `.claude/agents/final-reviewer.md`) available.
-- Architecture-checker active as standalone CLI grader: `python mcp/architecture-checker/checker.py examples/taskflow` (project root, not `src/` — see the checker's own docstring; D6 — relabelled as standalone CLI for v1; MCP server upgrade is a v1.1 item).
+- Architecture-checker active as standalone CLI grader: `python tools/architecture-checker/checker.py examples/taskflow` (project root, not `src/` — see the checker's own docstring; D6 — relabelled as standalone CLI for v1; MCP server upgrade is a v1.1 item).
 - **The initial prompt is standardized, not left to chance:** Claude is given `/ship-change <verbatim frozen task text>`, not the bare task text. "The Skill is available" does not guarantee any given trial actually invokes it — some B trials might and some might not, which would silently turn Condition B into two different conditions. Standardizing the invocation makes the intervention itself the fixed variable between A and B, not "whichever trials happened to reach for the Skill."
 
 ### 5.3 Trial Design
@@ -191,7 +190,7 @@ A second experimenter must be able to reproduce the grading judgment from these 
 
 Before any PR is merged:
 - [ ] `pytest` passes — all 8 baseline tests plus any new tests in the PR.
-- [ ] `python mcp/architecture-checker/checker.py examples/taskflow` reports **no more violations than the committed baseline** (`mcp/architecture-checker/check_logs/taskflow_baseline.json`, currently 20 — TaskFlow is intentionally born with `db-in-handler` and `missing-test` violations; "zero violations" is not an achievable baseline for this sandbox and was never a meaningful gate). Fail if the PR increases the count, or introduces a violation class absent from the baseline.
+- [ ] `python tools/architecture-checker/checker.py examples/taskflow` reports **no more violations than the committed baseline** (`tools/architecture-checker/check_logs/taskflow_baseline.json`, currently 20 — TaskFlow is intentionally born with `db-in-handler` and `missing-test` violations; "zero violations" is not an achievable baseline for this sandbox and was never a meaningful gate). Fail if the PR increases the count, or introduces a violation class absent from the baseline.
 - [ ] No new files created under `examples/taskflow/src/` that bypass the repository pattern.
 - [ ] `CLAUDE.md` and any modified Rules are internally consistent (no contradictions).
 
@@ -244,7 +243,7 @@ The following outcomes do **not** satisfy the v1 release criteria, regardless of
 | **M3 threshold met (≥8/9) but M1 violations > 2** | Test passage without architectural discipline is a partial result, not a gate pass. |
 | **Condition B run without a verifiable Condition A baseline** | The claim is comparative. Condition B results alone cannot confirm uplift. |
 | **Human grading of diffs not saved** | Grading that cannot be reproduced by a second reviewer does not meet the reproducibility standard. |
-| **Apparatus paths touched** | Any changes to the *immutable apparatus* — `evals/tasks/`, `evals/graders/`, `evals/protocol.yaml`, `.claude/`, `CLAUDE.md`, `mcp/architecture-checker/checker.py`, `book/`, `.github/`, or `governance/` — during a task-trial invalidate that trial. This does **not** include `examples/taskflow/src/` or `examples/taskflow/tests/` — those are the *mutable experimental target* T1/T3/T6 are supposed to modify; forbidding changes there would make a successful trial invalidate itself. *(Correction, 2026-09-03: the original list included `examples/taskflow/src/`/`tests/`, contradicting the task definitions in §3, which require modifying exactly those paths.)* |
+| **Apparatus paths touched** | Any changes to the *immutable apparatus* — `evals/tasks/`, `evals/graders/`, `evals/protocol.yaml`, `.claude/`, `CLAUDE.md`, `tools/architecture-checker/checker.py`, `book/`, `.github/`, or `governance/` — during a task-trial invalidate that trial. This does **not** include `examples/taskflow/src/` or `examples/taskflow/tests/` — those are the *mutable experimental target* T1/T3/T6 are supposed to modify; forbidding changes there would make a successful trial invalidate itself. *(Correction, 2026-09-03: the original list included `examples/taskflow/src/`/`tests/`, contradicting the task definitions in §3, which require modifying exactly those paths.)* |
 | **Human gate unresolved → DELIVERED claimed** | A stage or release cannot be marked DELIVERED while a decision gate is open, regardless of automated checks. |
 
 ---
@@ -253,11 +252,9 @@ The following outcomes do **not** satisfy the v1 release criteria, regardless of
 
 | Decision | Location |
 |----------|----------|
-| Resolved gate (D1–D8) | `.hyri/decision_gate_dec-e84f9216_resolved.md` |
-| Full decision brief | `governance/decision_brief_dec-e84f9216.md` |
 | TaskFlow sandbox | `examples/taskflow/README.md` |
 | Architectural constraints | `CLAUDE.md` (section: Architectural Constraints) |
-| Architecture checker CLI | `mcp/architecture-checker/checker.py` |
+| Architecture checker CLI | `tools/architecture-checker/checker.py` |
 | Task prompts (frozen) | `evals/tasks/T1.md`, `T3.md`, `T6.md` |
 | T3 pre-existing-database fixture | `evals/tasks/fixtures/T3_pre_existing_taskflow.db` |
 | Acceptance tests (apparatus, run after first submission) | `evals/acceptance/test_T1.py`, `test_T3.py`, `test_T6.py` |

@@ -1,8 +1,8 @@
 # Security Policy
 
-## Status: Proof Specimen
+## Status: Alpha
 
-MetaVibing is a **proof specimen** for Governed HyRI v0. It is **not a production service**, not a commercial product, and not intended for use in critical or security-sensitive contexts. No SLA, no support commitment.
+MetaVibing is a v0.1.0-alpha.1 research preview. It is **not a production service**, not a commercial product, and not intended for use in critical or security-sensitive contexts. No SLA, no support commitment.
 
 ## No Bug Bounty
 
@@ -11,11 +11,11 @@ There is **no bug bounty program** for this repository. Do not submit security r
 ## Scope
 
 This repository contains:
-- A practitioner manual and booklet (markdown/docx)
+- A practitioner manual (`book/manuscript.md`, built to PDF/DOCX in `dist/`)
 - A companion sandbox application (`examples/taskflow/`) — FastAPI + SQLite, for local development only
-- Governance and evaluation artifacts
+- An evaluation pilot design (`evals/`) — not yet run
 
-**TaskFlow** (`examples/taskflow/`) is the companion sandbox application. It is explicitly **not production-ready**: a prior structured readiness audit returned **NO-GO**, and that verdict has not been superseded. TaskFlow is intended for local experimentation only — do not expose it to the internet or use it to handle real user data.
+**TaskFlow** (`examples/taskflow/`) is the companion sandbox application. It is explicitly **not production-ready** — it's a deliberately imperfect specimen built to demonstrate real architectural friction, not a reference implementation. It is intended for local experimentation only — do not expose it to the internet or use it to handle real user data.
 
 ## API Keys and Credentials
 

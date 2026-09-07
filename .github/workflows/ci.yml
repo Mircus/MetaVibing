@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  taskflow-tests:
+    name: TaskFlow baseline (8 tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r examples/taskflow/requirements.txt
+      - run: cd examples/taskflow && pytest -q
+
+  architecture-checker-tests:
+    name: Architecture checker unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pytest -q tools/architecture-checker/test_checker.py
+
+  frontmatter-yaml-check:
+    name: .claude/ frontmatter + YAML validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install pyyaml
+      - run: python scripts/check_frontmatter.py
+
+  manual-build-smoke-test:
+    name: Manual build smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt
+      - run: python scripts/gen_assets.py
+      - run: python scripts/build_manual.py
+      - name: Verify build outputs exist
+        run: |
+          test -s dist/MetaVibing-Field-Manual-v0.1.pdf
+          test -s dist/MetaVibing-Field-Manual-v0.1.docx

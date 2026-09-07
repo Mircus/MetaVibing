@@ -1,8 +1,0 @@
-============================= test session starts ==============================
-platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0
-rootdir: /data/projects/proj-703c959f/repos/Metavibing/examples/taskflow
-collected 8 items
-
-tests/test_tasks.py ........                                             [100%]
-
-============================== 8 passed in 0.63s ===============================

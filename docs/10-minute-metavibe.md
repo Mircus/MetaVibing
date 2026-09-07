@@ -159,7 +159,7 @@ Deterministic Check   ← next
 One rung further down the ladder, stop asking any model — reviewer included — whether a constraint was obeyed, and check it mechanically instead:
 
 ```bash
-python mcp/architecture-checker/checker.py examples/taskflow
+python tools/architecture-checker/checker.py examples/taskflow
 ```
 
 This walks the actual AST of `src/`, looking for direct database calls inside route handlers, and reports every one it finds — the same rule from Section 4, now enforced by code instead of judgment.

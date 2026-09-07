@@ -1,6 +1,6 @@
-"""Unit tests for the architecture checker CLI (mcp/architecture-checker/checker.py).
+"""Unit tests for the architecture checker CLI (tools/architecture-checker/checker.py).
 
-Run with: pytest mcp/architecture-checker/test_checker.py
+Run with: pytest tools/architecture-checker/test_checker.py
 """
 import json
 import subprocess

@@ -8,3 +8,9 @@ venv/
 node_modules/
 .DS_Store
 taskflow.db
+*.log
+*.tmp
+.coverage
+htmlcov/
+.hyri/
+evals/results/

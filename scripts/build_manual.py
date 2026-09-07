@@ -21,7 +21,7 @@ ASSETS = ROOT / "book" / "assets"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
 
-VERSION_LABEL = "v0.1 Research Preview"
+VERSION_LABEL = "v0.1.0-alpha.1 — Alpha Research Preview"
 TITLE = "MetaVibing"
 SUBTITLE = "A Field Manual for Evolving Your AI Collaborator"
 

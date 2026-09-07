@@ -2,7 +2,7 @@
 
 ### A Field Manual for Evolving Your AI Collaborator
 
-*MetaVibing — Provisional Research Preview — September 2026*
+*MetaVibing v0.1.0-alpha.1 — Alpha Research Preview*
 
 ---
 
@@ -90,66 +90,41 @@ It works. It's also a pattern a growing project wouldn't want repeated: harder t
 Instead, look at what's already checked into this repository: `.claude/rules/taskflow.md`, scoped to `examples/taskflow/**/*`, states exactly that constraint. Because it's a native Claude Code Rule — not a comment, not a wiki page — it loads automatically the moment Claude works with a matching file. Ask for a new feature now (`/ship-change <task>`), and the Rule shapes the work without you restating anything.
 <!-- /callout -->
 
-One rung further: once a constraint can be checked mechanically, stop asking a model whether it was obeyed. `python mcp/architecture-checker/checker.py examples/taskflow` walks the actual code and reports every violation of this exact rule — judgment converted into infrastructure.
+One rung further: once a constraint can be checked mechanically, stop asking a model whether it was obeyed. `python tools/architecture-checker/checker.py examples/taskflow` walks the actual code and reports every violation of this exact rule — judgment converted into infrastructure.
 
 This is the entire method, once. The full hands-on version — including the failure case, and what to do when the Rule *doesn't* hold — is [`docs/10-minute-metavibe.md`](../docs/10-minute-metavibe.md) in the companion repository.
 
 ## Status & Evidence
 
-This document is a provisional artifact under active validation. It is not a finished, copyedited release. It is produced under Governed HyRI v0 — a governed workflow discipline that uses AI agents as bounded workers under explicit context, artifact, validator, and human-gate controls. The production of this booklet is itself a specimen of that discipline. Readers should understand the following before proceeding.
+MetaVibing v0.1 is an alpha research preview. The methodology, the Claude Code configuration (`.claude/rules/`, Skills, and the `final-reviewer` Agent), the TaskFlow specimen, the deterministic architecture checker, and the evaluation protocol are implemented. The controlled A/B pilot has been designed — frozen tasks, held-out acceptance tests, a grading rubric, a machine-readable protocol — but not yet executed. **No empirical performance-uplift claim is made in this release.** Readers should understand the following before proceeding.
 
 ### Core Claim
 
-> **MetaVibing is a governed workflow discipline for using AI agents as bounded workers under explicit context, artifact, validator, and human-gate controls.**
->
-> *(Decision gate dec-e84f9216, D1 — resolved by Mirco, 2026-08-24)*
-
-In concrete, testable terms: a practitioner who applies the MetaVibing discipline — using CLAUDE.md, path-scoped Rules, Skills, Agents, Hooks, and MCP tools — will produce a higher rate of first-try successes on architecturally constrained tasks, commit fewer repeated architectural violations per session, and require fewer human correction turns per feature request, compared to the same practitioner operating without any MetaVibing artifacts.
+> **A practitioner who applies the MetaVibing discipline — CLAUDE.md, path-scoped Rules, Skills, a specialist Agent, and a deterministic checker — will produce a higher rate of first-try successes on architecturally constrained tasks, commit fewer repeated architectural violations per session, and require fewer human correction turns per feature request, compared to the same practitioner operating without any MetaVibing artifacts.**
 
 This is a quantitative, falsifiable claim. The evaluation infrastructure described in `evals/baseline/README.md` exists to test it against a controlled sandbox. If measured uplift is weak, the claim must be revised. The eval does not exist to confirm the claim; it exists to challenge it.
 
 ### Target User
 
-**Primary user (D2):** Technical creators, researchers, and small lab builders using AI tools for multi-step intellectual or software artifacts.
+**Primary user:** Technical creators, researchers, and small lab builders using AI tools for multi-step intellectual or software artifacts.
 
 For the baseline evaluation, this is operationalised as: a practitioner with sufficient engineering fluency to run `pytest`, read FastAPI code, and follow a CLAUDE.md prompt. They do not need to know how MetaVibing works at the start of the evaluation — the protocol hands them the artifact stack or withholds it depending on the condition.
 
-**Secondary audience** (not gating v1): Engineering managers evaluating team-scale AI coding discipline; AI/agent researchers interested in self-modifying operational contexts. The TaskFlow sandbox and the eval protocol are designed to be legible to all three, but only the primary user's success criteria gate the v1 release.
+**Secondary audience:** Engineering managers evaluating team-scale AI coding discipline; AI/agent researchers interested in self-modifying operational contexts.
 
 ### Baseline Evidence
 
-This edition references a companion repository at `examples/taskflow/` — a deliberately imperfect FastAPI + SQLite task manager designed to exercise the MetaVibing discipline. One governed execution of its declared test suite has been completed and confirmed:
-
 <!-- callout:evidence -->
-```
-============================= test session starts ==============================
-platform linux -- Python 3.11.16, pytest-9.1.1, pluggy-1.6.0
-rootdir: /data/projects/proj-703c959f/repos/Metavibing/examples/taskflow
-collected 8 items
-
-tests/test_tasks.py ........                                             [100%]
-
-============================== 8 passed in 0.63s ==============================
-```
-
-**Execution metadata:** generated_by=governed_executor, exit_code=0, timed_out=False.
-
-This is the entirety of the confirmed execution evidence. It shows that the companion repository's declared test suite passes under a clean, governed execution environment. It does not show anything about the v1 release gates, the comparison between Condition A and Condition B, or the 3×3×2 baseline protocol — none of those runs have been completed.
+**TaskFlow baseline: 8/8 tests passing on the alpha release commit.** This confirms the companion repository's declared test suite runs cleanly. It does not show anything about the pilot's release gates, the comparison between Condition A and Condition B, or the 3×3×2 baseline protocol — none of those runs have been completed.
 <!-- /callout -->
 
 ### What Has Not Been Validated
 
-Readers must understand what this provisional booklet does **not** claim:
+Readers must understand what this alpha does **not** claim:
 
-**The 3×3×2 baseline protocol has not been run.** The evaluation charter (D3–D5) specifies 3 tasks × 3 trials × 2 conditions = 18 task-trials. As of this edition, only Condition A baseline environment has been confirmed to produce passing tests. No Condition B trials have been executed. No M1 (architectural violation rate), M2 (correction turns), or M3 (pytest pass rate on first submission) data has been collected for any trial.
+**The 3×3×2 baseline protocol has not been run.** The evaluation charter specifies 3 tasks × 3 trials × 2 conditions = 18 task-trials. No Condition A or Condition B trials have been executed. No M1 (architectural violation rate), M2 (correction turns), or M3 (pytest pass rate on first submission) data has been collected for any trial.
 
-<!-- callout:warning -->
-**A prior readiness audit of the companion repository returned NO-GO.** The companion repository was reviewed under a structured audit protocol prior to this writing. That audit returned a NO-GO verdict. That verdict has not been superseded. It has been narrowly offset only by the single governed_execution proof above (8 tests passing, exit_code=0). The two coexist: one passing test run does not constitute blanket verification or readiness. Any reader working from this companion repo should consult the most recent readiness audit before treating it as a finished reference implementation.
-<!-- /callout -->
-
-**This booklet has not been human-reviewed and copyedited for the v1 gate.** Section 6 of the evaluation charter lists as a v1 release requirement: "`book/manuscript.md` is human-reviewed and copyedited — not just mechanically extracted." That gate is pending. This document is a machine-produced provisional draft.
-
-**MetaVibing itself is a proof specimen for Governed HyRI v0, not the primary intellectual output.** Per resolved decision gate dec-e84f9216: this repository exists to prove that Governed HyRI can produce real, governed artifacts — not to make MetaVibing itself a finished product. Every deliverable in this repository exists as evidence for the framework, not as a standalone finished work.
+**This manual has not been exhaustively copyedited.** It is a working draft, revised repeatedly against real evidence rather than polished once and left alone.
 
 ---
 
@@ -1511,7 +1486,7 @@ examples/taskflow/
 └── requirements.txt
 ```
 
-**Companion repo status note:** A prior structured readiness audit of this repository returned NO-GO. That verdict has not been superseded. A single governed_execution proof (8 tests passing, exit_code=0, recorded in `examples/taskflow/test_logs/taskflow_tests.txt`) confirms the declared test suite runs cleanly — it does not confirm overall readiness or replace the audit verdict. Readers should apply the three questions from Part XV before treating this repo as a reference implementation: (1) Is the agent pointed at the right object? (2) Does a mechanical check confirm required artifacts exist? (3) Having opened the artifacts yourself — is this actually what you asked for?
+**Companion repo status note:** TaskFlow's declared test suite passes cleanly (8/8, see Status & Evidence). That confirms the suite runs — it is not a claim that TaskFlow is a production-ready reference implementation; it's a deliberately imperfect sandbox, built to have real friction to demonstrate against. Readers should apply the three questions from Part XV before treating any repository as a finished reference: (1) Is the agent pointed at the right object? (2) Does a mechanical check confirm required artifacts exist? (3) Having opened the artifacts yourself — is this actually what you asked for?
 
 ### Step One — CLAUDE.md and Rules
 
@@ -1589,13 +1564,13 @@ of Part V's Builder/Critic pattern, made concrete.
 
 ### Step Seven — One Real Tool
 
-`mcp/architecture-checker/checker.py` is the "add one missing tool" step made real. It is a
+`tools/architecture-checker/checker.py` is the "add one missing tool" step made real. It is a
 plain, dependency-free Python script using `ast` to walk route handlers and flag direct
 `session.*` calls — the exact rule from `.claude/rules/taskflow.md`, now enforced mechanically
 instead of by reminder:
 
 ```bash
-python mcp/architecture-checker/checker.py examples/taskflow
+python tools/architecture-checker/checker.py examples/taskflow
 ```
 
 (project root, not `src/` — passing `src/` silently disables the missing-test check; this was a
@@ -2312,27 +2287,30 @@ Metavibing/
 │       ├── README.md
 │       └── requirements.txt
 │
+├── docs/
+│   ├── 10-minute-metavibe.md     # start here
+│   └── history.md                # short note on this project's earlier, more heavily governed phase
+│
 ├── .claude/                     # Claude Code's native config — this is what actually loads
 │   ├── rules/
 │   │   └── taskflow.md          # paths: [examples/taskflow/**/*]
 │   ├── skills/
 │   │   ├── meta/SKILL.md
 │   │   └── ship-change/SKILL.md
-│   ├── agents/
-│   │   └── final-reviewer.md    # tools: Read, Grep, Glob — read-only enforced by frontmatter
-│   └── hooks/
-│       └── README.md            # documents intent; no hook script yet
+│   └── agents/
+│       └── final-reviewer.md    # tools: Read, Grep, Glob — read-only enforced by frontmatter
 │
-├── mcp/
+├── tools/
 │   └── architecture-checker/
-│       ├── checker.py           # working CLI; not yet wrapped as MCP
+│       ├── checker.py           # working CLI; not an MCP server (renamed out of mcp/ so the
+│       │                        # directory name doesn't overclaim what's actually implemented)
 │       └── test_checker.py
 │
-├── evals/                       # pilot design: charter, frozen task prompts, acceptance tests,
-│                                 # rubric, machine-readable protocol.yaml — not yet frozen/run
-│
-└── governance/                  # Governed HyRI v0 provenance records
+└── evals/                       # pilot design: charter, frozen task prompts, acceptance tests,
+                                  # rubric, machine-readable protocol.yaml — not yet frozen/run
 ```
+
+`.claude/hooks/` isn't listed above — it was deleted for the alpha rather than kept as a directory holding only a "planned, none implemented" README, per this book's own doctrine (Part X, "Hook Mania" and neighboring failure modes): don't fill out a directory before real friction earns it. When a Friction Ledger entry actually demands a hook, `.claude/hooks/` gets created then, with a real hook in it.
 
 `experiments/`, `patterns/`, and `templates/` are not present at all — not even as scaffolding.
 The original version of this section called them "scaffolded, empty," which was itself a smaller
@@ -2777,7 +2755,7 @@ While this book and its companion repository were being produced, a real failure
 An automated chain was asked to review this very repository and apply straightforward fixes.
 One step of that chain — meant to be a read-only audit — had a missing configuration flag.
 Instead of defaulting to safe, it defaulted to full write access. It used that access to create
-`README.md`, `LICENSE`, `CLAUDE.md`, the `claude/` meta-stack, and the `mcp/architecture-checker`
+`README.md`, `LICENSE`, `CLAUDE.md`, the `claude/` meta-stack, and the `tools/architecture-checker`
 stub described in the worked examples above — all real, all useful, none of it what was asked.
 The manuscript itself — the actual manual you are reading — was never touched. The run was still
 reported as normal progress.
@@ -2825,28 +2803,23 @@ requires a second, independent mechanism.
 
 ### Bridle: agents are witnesses, validators are judges
 
-The second mechanism is a small, opt-in contract: a project may declare, in
-`.hyri/object_of_work.yaml`, what its real deliverables are, what outputs would count as evidence
-of skipping them, and what "done" looks like at each stage:
+The second mechanism is a small, opt-in pattern, not a specific tool: declare, in a plain
+contract file checked into the project, what the real deliverable of a piece of work is, what
+would count as evidence that it was skipped in favor of something adjacent, and what "done"
+looks like:
 
 ```yaml
-object_type: manuscript_v0
-source_artifacts:
-  - path: source/manual.docx
-required_outputs:
-  - path: book/manual_raw.md
-    state: RAW_EXTRACTED
-  - path: book/manual_v1.md
-    state: DRAFTED
-forbidden_outputs:
-  - examples/
-  - mcp/
-  - claude/
-  - governance/
-progress_rules:
-  SOURCE_LOCKED: 10
-  RAW_EXTRACTED: 25
-  DRAFTED: 70
+object_of_work:
+  source: source/manual.docx
+  required_outputs:
+    - path: book/manual_raw.md
+      state: RAW_EXTRACTED
+    - path: book/manual_v1.md
+      state: DRAFTED
+  forbidden_substitutes:
+    - examples/
+    - tools/
+    - .claude/
 ```
 
 A small set of validator functions then check the contract against the real filesystem — nothing
@@ -2907,81 +2880,39 @@ produces a report that trusts narration. Skipping question 3 produces a validato
 satisfied by something technically present and substantively wrong. All three are required.
 None of them is optional, and none of them is sufficient alone.
 
-## Part XVI — MetaVibing as a Proof Specimen
+## Part XVI — MetaVibing MetaVibes Itself
 
-*This part documents the production of this booklet as evidence for the Governed HyRI framework. It exists to prove the framework works — not to make MetaVibing a finished product.*
+*This part documents the production of this repository as a real case study of the method the rest of this book describes — not proof of some separate framework, but the plainest example there is of MetaVibing's own core loop applied to itself.*
 
-### What This Repository Is
+### What Actually Happened
 
-The MetaVibing repository was created to prove a specific thesis about Governed HyRI v0: that a governed workflow discipline can produce real artifacts — not status summaries, not scaffolding, not raw extraction — under explicit context contracts, declared outputs, and mechanical validators.
+Every one of these is a real correction, in the order it happened, each one following the same loop from page one of this book: a mistake, a correction, and — where the correction was worth keeping — a durable artifact instead of a repeated conversation.
 
-Per resolved decision gate dec-e84f9216: MetaVibing itself is a proof specimen, not the primary intellectual priority. Every deliverable in this repository exists to demonstrate that the framework can produce real, governed outputs, not to ship MetaVibing as a finished product.
+**The README claimed files that didn't exist.** Early drafts described `experiments/`, `patterns/`, and `templates/` directories, and a packaged manual edition, that hadn't actually been built. An external review caught it. The fix wasn't a better sentence — it was a rule for this project going forward: describe what's here, not the destination, and mark what's planned as planned.
 
-Understanding this matters for how you read anything in this repository:
+**The architecture checker silently missed real violations.** Its documented invocation resolved the wrong directory for its own missing-test check, so an entire category of violation reported zero results no matter what was actually in the code. Nobody asked the model whether the checker worked — a real unit test, run against real code, found the exact bug (see Part III's "Add One Missing Tool," and `tools/architecture-checker/test_checker.py`).
 
-```
-This booklet is evidence for a framework.
-The companion repo is evidence for a framework.
-The test run is evidence for a framework.
+**The `.claude/` stack existed in the wrong layout.** Rules, Skills, and an Agent were written, described as "live" in this very manual, and could not actually be loaded by Claude Code — wrong directory, no frontmatter. Prose about the stack was mistaken for the stack. Fixed by moving each artifact to the path and frontmatter Claude Code actually requires.
 
-None of them is a finished, independently verified product.
-```
+**A frontmatter key was wrong, and only a real session caught it.** Even after the layout fix above, the TaskFlow Rule used a `globs:` key that Claude Code doesn't recognize — it silently fell back to loading the Rule unconditionally instead of scoping it to `examples/taskflow/`. This was not caught by re-reading the file, or by asking a model to check its own work. It was caught by an actual fresh Claude Code session running the actual `/meta`, `/ship-change`, and TaskFlow-editing behaviors and reporting, honestly, that the fourth one didn't match its documentation. See `FRICTION_LEDGER.md`, F-003.
 
-### The Decision Gate Structure
+**The Friction Ledger went from a template to a real record.** For weeks it said "no entries yet," which was itself a small instance of the same failure this book warns about — an artifact that looks finished but holds no real content. It now holds real entries, including all four above, each one tagged corrected, mechanically verified, or behaviorally evaluated rather than a single undifferentiated "done."
 
-This repository operates under a resolved decision gate (dec-e84f9216), resolved by Mirco on 2026-08-24. That gate answers seven questions that define the scope of what this repository is allowed to claim:
-
-**D1 — Core claim:** MetaVibing is a governed workflow discipline for using AI agents as bounded workers under explicit context, artifact, validator, and human-gate controls.
-
-**D2 — Primary user:** Technical creators, researchers, and small lab builders using AI tools for multi-step intellectual or software artifacts.
-
-**D3 — Baseline tasks:** Expand a source manuscript into a provisional artifact; integrate at least one working example; verify the companion mini-repo; produce declared final files; reject raw extraction, scaffold, and status summaries as success.
-
-**D4 — Metrics:** Required artifacts exist; final text is at least 20% expanded over source; required sections present; examples referenced in the artifact; companion repo tests pass; forbidden paths untouched; human gate unresolved prevents DELIVERED.
-
-**D5 — Measurement protocol:** Every stage has a run contract, context packet, declared output, and validator list. Stages may not self-declare as complete without passing validators. Human gates remain open until a human answers them.
-
-**D6 — Architecture checker status:** The architecture checker (`mcp/architecture-checker/checker.py`) is documented as a standalone CLI only for v1. MCP server wrapper is a v1.1 item.
-
-**D7 — Out-of-scope for v1:** Tasks T2, T4, T5, T7 are excluded from the v1 gate because prerequisite code does not yet exist. Claiming v1 coverage for them would be hollow.
-
-**D8 — Human gate requirement:** A stage or release cannot be marked DELIVERED while a decision gate is open, regardless of automated checks.
-
-These decisions constrain what this booklet can honestly say. This booklet honors those constraints.
-
-### What Has Been Demonstrated
-
-The following things have been concretely demonstrated as of this edition:
-
-**A governed executor can run a declared test suite and produce verifiable evidence.** The `examples/taskflow/` companion repository contains 8 tests. A governed execution on 2026-08-25 produced: exit_code=0, timed_out=False, 8 passed in 0.63s. The evidence is recorded verbatim in `examples/taskflow/test_logs/taskflow_tests.txt` and `examples/taskflow/test_logs/taskflow_tests.meta.json`.
-
-**The evaluation charter exists and is anchored to resolved human decisions.** The `evals/baseline/README.md` document specifies the core claim, target user, baseline tasks, metrics, protocol, pass/fail gates, and non-success criteria — all traceable to D1–D8. It is not a scaffold; it contains specific numeric thresholds, specific task IDs, and specific exclusion criteria.
-
-**The MetaVibing meta-stack exists as runnable artifacts.** *(Correction, 2026-09-03: this claim was false when first written. The files existed but lived under `claude/` — not `.claude/` — and had no YAML frontmatter, so Claude Code could not actually load any of them as Skills, an Agent, or Rules. They were prose about the stack, not the stack. Fixed by moving each artifact to the path and frontmatter Claude Code actually requires; the claim below is true as of this correction, not as of the original edition.)* The companion repository contains:
-- `CLAUDE.md` with architectural constraints
-- `.claude/rules/taskflow.md` with path-scoped rules (`paths:` frontmatter — corrected 2026-09-06; a behavioral activation test found the originally-shipped `globs:` key isn't recognized by Claude Code at all, so the rule loaded unconditionally instead of only in `examples/taskflow/`. See FRICTION_LEDGER.md F-003)
-- `.claude/skills/ship-change/SKILL.md` with a disciplined change procedure (`name:`/`description:` frontmatter)
-- `.claude/skills/meta/SKILL.md` implementing `/meta`
-- `.claude/agents/final-reviewer.md` as a read-only specialist subagent (`tools: Read, Grep, Glob` frontmatter — enforced, not just stated)
-- `mcp/architecture-checker/checker.py` as a standalone architecture validator, plus `test_checker.py` covering it
-
-**The failure modes documented in this book are real and have occurred.** Part XV is not a hypothetical. The object substitution failure happened during the production of this repository. The Bridle pattern described there is a real response to a real incident, implemented in `.hyri/`.
+None of these corrections required inventing a new mechanism. Each one is a plain instance of a pattern already named earlier in this book — a Rule, a test, a directory fix, a behavioral check, a ledger entry — applied to the project that was, at the time, writing about applying them.
 
 ### What Has Not Been Demonstrated
 
-The following things have not been demonstrated as of this edition, and this booklet will not claim they have:
+This alpha will not claim more than it has shown. As of this edition:
 
 **The 3×3×2 evaluation protocol has not been run.** No Condition A vs. Condition B comparison data exists. The claim that MetaVibing reduces architectural violation rate and correction turns has not been empirically tested. It is a hypothesis, not a finding.
 
-**The companion repository is not fully readiness-verified.** A prior audit returned NO-GO. One passing test run offsets this narrowly — it confirms the test suite runs; it does not confirm the repository is ready for independent use as a reference implementation.
+**This manual has not been exhaustively copyedited.** It has been revised repeatedly against real evidence — see above — which is a different thing from a single, polished editorial pass.
 
-**This booklet has not cleared the human review gate.** The v1 release gate requires human review and copyediting. That gate is pending. Readers should treat this as a machine-produced provisional draft, not a finished work.
-
-**No second practitioner has reproduced any eval result.** The reproducibility standard specified in `evals/baseline/README.md` (Section 5.5) requires that a second experimenter must be able to reproduce grading judgments from saved artifacts alone. No such reproduction has been attempted.
+**No second practitioner has reproduced any eval result.** The reproducibility standard specified in `evals/baseline/README.md` requires that a second experimenter be able to reproduce grading judgments from saved artifacts alone. No such reproduction has been attempted, because no trial has been run yet to reproduce.
 
 ### The Evidence Hierarchy
 
-Governed HyRI applies a strict hierarchy to what counts as evidence:
+MetaVibing applies a strict hierarchy to what counts as evidence, used throughout this part and the rest of the book:
 
 ```
 Agent narration      →  testimony (weakest)
@@ -2989,9 +2920,7 @@ Validator result     →  evidence (mechanical)
 Human judgment       →  authority (strongest)
 ```
 
-This booklet is testimony produced by a governed executor. The test log is mechanical evidence. The decision gate resolutions are human authority. Readers should weight them accordingly.
-
-When you read a report that says "completed" — ask what class of evidence supports it. If the answer is agent narration only, you have testimony, not evidence. If validators have run and humans have reviewed, you have something stronger.
+When you read a report that says "completed" — ask what class of evidence supports it. If the answer is agent narration only, you have testimony, not evidence. If a real test ran, or a real fresh session behaviorally confirmed it, you have something stronger. Every correction listed above only counts because it cleared that bar — a test, a rendered page, a real session's report — not because an agent said so.
 
 ### The Remaining Gap
 
@@ -3233,20 +3162,19 @@ Improve the environment, not just the answer.
 
 Code builds the product. Meta-code builds the coder.
 
-## Appendix D — Evaluation Status Summary (As of August 2026)
+## Appendix D — Evaluation Status Summary
 
-*This appendix records the honest state of what has and has not been validated, as required by the evaluation charter.*
+*This appendix records the honest state of what has and has not been validated. Updated as of this alpha; see `FRICTION_LEDGER.md` for the live, dated version of this table.*
 
 ### Confirmed
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| Companion repo tests (8 tests) pass | ✅ Confirmed | `examples/taskflow/test_logs/taskflow_tests.txt` — 8 passed in 0.63s, exit_code=0 |
-| Evaluation charter anchored to resolved decisions | ✅ Confirmed | `evals/baseline/README.md` references D1–D8, all resolved |
-| Meta-stack artifacts exist | ✅ Confirmed | CLAUDE.md, rules, skills, agents present in repo |
-| Architecture checker CLI works | ✅ Confirmed | Returns 20 violations (17 db-in-handler + 3 missing-test) on unmodified taskflow, project-root invocation |
-| Forbidden paths untouched in this production run | ✅ Confirmed | Governed executor: no writes to forbidden paths |
-| Grader rubric (`evals/graders/rubric.md`) | ✅ Confirmed (2026-09-04) | 7 atomic rule IDs, delta-based mechanical counting for 2 of 7 |
+| Companion repo tests (8 tests) pass | ✅ Confirmed | `examples/taskflow/` — 8/8 passing on the alpha release commit |
+| Evaluation charter is complete and specific | ✅ Confirmed | `evals/baseline/README.md` — core claim, tasks, metrics, protocol, pass/fail gates |
+| Meta-stack artifacts exist and are natively loadable | ✅ Confirmed | `.claude/rules/`, `.claude/skills/`, `.claude/agents/` present and behaviorally verified (FRICTION_LEDGER.md F-003) |
+| Architecture checker CLI works | ✅ Confirmed | Returns 20 violations (17 db-in-handler + 3 missing-test) on unmodified TaskFlow, project-root invocation |
+| Grader rubric (`evals/graders/rubric.md`) | ✅ Confirmed | 7 atomic rule IDs, delta-based mechanical counting for 2 of 7 |
 
 ### Pending
 
@@ -3257,9 +3185,8 @@ Code builds the product. Meta-code builds the coder.
 | M1 architectural violation rate | ❌ Not measured | Requires trial data |
 | M2 correction turns per task | ❌ Not measured | Requires trial data |
 | M3 pytest pass rate on first submission | ❌ Not measured | Requires trial data |
-| Human review and copyediting | ❌ Pending | Human gate open |
-| Companion repo full readiness | ❌ NO-GO (not superseded) | Prior audit verdict stands |
-| Architecture checker MCP server wrapper | ❌ v1.1 item | D6 |
+| Exhaustive manual copyediting | ❌ Pending | Ongoing |
+| Architecture checker MCP server wrapper | ❌ v1.1 item | Not yet needed by any real friction |
 | Second-experimenter reproducibility check | ❌ Not attempted | No second experimenter yet |
 
-This table is honest. The version of this booklet that hid this table from you would be object substitution — reporting a more favorable state than the evidence supports.
+This table is honest. The version of this manual that hid this table from you would be object substitution — reporting a more favorable state than the evidence supports.

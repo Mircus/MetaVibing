@@ -1,6 +1,8 @@
-<img src="book/assets/logo.png" alt="MetaVibing" width="90" />
+<img src="book/assets/logo.png" alt="MetaVibing" width="200" />
 
 # MetaVibing
+
+[![CI](https://github.com/Mircus/MetaVibing/actions/workflows/ci.yml/badge.svg)](https://github.com/Mircus/MetaVibing/actions/workflows/ci.yml)
 
 **Stop correcting your AI. Start evolving the environment it works in.**
 
@@ -91,14 +93,21 @@ MetaVibing/
 ├── README.md
 ├── LICENSE
 ├── CLAUDE.md
+├── CHANGELOG.md
 ├── FRICTION_LEDGER.md            # live — 5 real entries from this repo's own history
 │
+├── .github/workflows/ci.yml      # TaskFlow tests, checker tests, frontmatter checks, manual build
+│
 ├── docs/
-│   └── 10-minute-metavibe.md     # start here
+│   ├── 10-minute-metavibe.md     # start here
+│   └── history.md                # short note on this project's earlier, more heavily governed phase
 │
 ├── book/                         # live
 │   ├── manuscript.md             # canonical source
+│   ├── assets/                   # logo + diagrams used by the built manual
 │   └── archive/                  # prior edition + original manuscript, kept for reference
+│
+├── dist/                         # built PDF/DOCX releases
 │
 ├── examples/
 │   └── taskflow/                 # live — FastAPI/SQLite specimen, 8 passing tests
@@ -106,15 +115,14 @@ MetaVibing/
 ├── .claude/                      # Claude Code's native config — this is what actually loads
 │   ├── rules/                    # live
 │   ├── skills/                   # live — /meta, /ship-change
-│   ├── agents/                   # live — final-reviewer
-│   └── hooks/                    # planned — none implemented yet
+│   └── agents/                   # live — final-reviewer
 │
-├── mcp/
-│   └── architecture-checker/     # live as a standalone CLI; MCP wrapper planned for v1.1
+├── tools/
+│   └── architecture-checker/     # live as a standalone CLI — not named mcp/, since it isn't one yet
 │
 ├── evals/                        # live — pilot design: tasks, acceptance tests, rubric, protocol.yaml (design published; not yet frozen or run)
 │
-└── governance/                   # provenance records — see governance/ if you care how this repo's artifacts were produced
+└── scripts/                      # build tooling — manual PDF/DOCX build, frontmatter checks
 ```
 
 ## Evidence Status
@@ -143,7 +151,8 @@ What doesn't exist: the trial runner, and the trials themselves. This will be re
 | XI | The MetaVibing Maturity Model |
 | XII–XIII | A Complete Session, and the Starter Kit |
 | XIV | The Central Discipline |
-| XV–XVI | Worked Examples, and MetaVibing as a Proof Specimen |
+| XV | Worked Example: The Bridle Pattern |
+| XVI | MetaVibing MetaVibes Itself |
 
 The prior packaged edition and the original unexpanded manuscript are kept in [`book/archive/`](book/archive/) for reference, never edited after being archived — see [`book/README.md`](book/README.md) for the full pipeline.
 
@@ -161,4 +170,4 @@ MIT — see [LICENSE](LICENSE)
 
 ---
 
-*MetaVibing — Provisional Research Preview — September 2026*
+*MetaVibing v0.1.0-alpha.1 — Alpha Research Preview*
